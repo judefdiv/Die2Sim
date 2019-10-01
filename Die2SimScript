@@ -1,0 +1,13 @@
+#!/bin/bash
+
+clear
+
+echo "------------- Script to for Die2Sim ---------------"
+
+cd build
+cmake .. && \
+make && \
+cd ../
+./build/Die2Sim -c
+
+echo "------------------ Script ended -------------------"
