@@ -4,63 +4,21 @@
  * For:					Supertools, Coldflux Project - IARPA
  * Created: 		2019-03-30
  * Modified:
- * license: 
+ * license:
  * Description: Class for storing .def
  * File:				ClassDef.cpp
  */
 
 #include "die2sim/ClassDef.hpp"
 
-/** 
- * OverHeads class functions
+/**
+ * DEF file class functions
  */
 
-def_OverHeads::def_OverHeads(){
-
-}
-
-void def_OverHeads::createAuto(vector<string> &inLine){
+void def_file::createAuto(vector<string> &inLine){
 	string keyword = inLine[0];
-	if(keyword == "ROW"){
-		if(inLine.size() != 14){
-			cout << "USC changed syntax, break..." << endl;
-		}
-		OH_row tempROW;
-		tempROW.siteName = inLine[1];
-		tempROW.origX = stoi(inLine[2]);
-		tempROW.origY = stoi(inLine[3]);
-		tempROW.numX = stoi(inLine[6]);
-		tempROW.numY = stoi(inLine[8]);
-		tempROW.stepX = stoi(inLine[10]);
-		tempROW.stepY = stoi(inLine[11]);
 
-		this->ROW.push_back(tempROW);
-	}
-	else if(keyword == "TRACKS"){
-		OH_tracks tempTRACK;
-		tempTRACK.axis = inLine[1];
-		tempTRACK.start = stoi(inLine[2]);
-		tempTRACK.numtracks = stoi(inLine[4]);
-		tempTRACK.space = stoi(inLine[6]);
-		tempTRACK.LAYER = inLine[8];
-
-		this->TRACKS.push_back(tempTRACK);
-	}
-	else if(keyword == "GCELLGRID"){
-		if(inLine[1] == "X"){
-			this->GCGx[0] = stoi(inLine[2]);
-			this->GCGx[1] = stoi(inLine[4]);
-			this->GCGx[2] = stoi(inLine[6]);
-		}
-		else if(inLine[1] == "Y"){
-			this->GCGy[0] = stoi(inLine[2]);
-			this->GCGy[1] = stoi(inLine[4]);
-			this->GCGy[2] = stoi(inLine[6]);
-		}
-		else
-			cout << "GCELLGRID syntax error" << endl;
-	}
-	else if(keyword == "DIEAREA"){
+	if(keyword == "DIEAREA"){
 		if(inLine.size() != 11){
 			cout << "DIEAREA syntax has changed, break..." << endl;
 		}
@@ -79,81 +37,190 @@ void def_OverHeads::createAuto(vector<string> &inLine){
 		this->DESIGN = inLine[1];
 	}
 	else{
-		cout << "Uhm, this is not suppose to be here." << endl;
+		cout << "Skipping line." << endl;
 	}
 }
 
-void def_OverHeads::to_str(){
-	cout << "Overheads Class:" << endl;
+/**
+ * [def_file::importFile description]
+ * @param  fileName [File name of the def file to be imported]
+ * @return          [1 - All good, 0 - Error]
+ */
+
+int def_file::importFile(string fileName){
+	vector<string> lineVec;
+	vector<vector<string> > strBlock;
+	string keyword;
+
+	ifstream defFile;
+
+	bool proOH = false;
+
+	cout << "Importing DEF file \""  << fileName << "\"" << endl;
+
+	defFile.open(fileName);
+
+	if(!defFile.is_open()){
+		cout << "DEF file \""  << fileName << "\" failed to be opened." << endl;
+		return 0;
+	}
+
+	while(1){
+		lineVec = splitFileLine(defFile);
+		keyword = lineVec[0];
+		// disVector(lineVec);
+
+		if(this->validNBlkWords.find(keyword) != this->validNBlkWords.end()){
+			if(keyword == "COMPONENTS"){
+				cout << "Processing components..." << endl;
+				this->comps.resize(stoi(lineVec[1]));
+
+				unsigned int compIndex = 0;
+				lineVec = splitFileLine(defFile);
+				while(lineVec[0] != "END" && lineVec[1] != "COMPONENTS"){
+					this->comps[compIndex++].createAuto(lineVec);
+					lineVec = splitFileLine(defFile);
+				}
+			}
+			else if(keyword == "NETS"){
+				cout << "Processing nets..." << endl;
+				this->nets.resize(stoi(lineVec[1]));
+
+				unsigned int netIndex = 0;
+				lineVec = splitFileLine(defFile);
+
+				while(lineVec[0] != "END" && lineVec[1] != "NETS"){
+					while(lineVec[lineVec.size()-1] != ";"){
+						strBlock.push_back(lineVec);
+						lineVec = splitFileLine(defFile);
+					}
+					strBlock.push_back(lineVec);
+
+					// disVectorBlk(strBlock);
+					this->nets[netIndex++].createAuto(strBlock);
+
+					strBlock.clear();
+					lineVec = splitFileLine(defFile);
+				}
+			}
+			else if(keyword == "SPECIALNETS"){
+				cout << "Processing special nets..." << endl;
+				this->snets.resize(stoi(lineVec[1]));
+
+				unsigned int snetIndex = 0;
+				lineVec = splitFileLine(defFile);
+
+				while(lineVec[0] != "END" && lineVec[1] != "SPECIALNETS"){
+					while(lineVec[lineVec.size()-1] != ";"){
+						strBlock.push_back(lineVec);
+						lineVec = splitFileLine(defFile);
+					}
+					strBlock.push_back(lineVec);
+
+					// disVectorBlk(strBlock);
+					this->snets[snetIndex++].createAutoSpecial(strBlock);
+
+					strBlock.clear();
+					lineVec = splitFileLine(defFile);
+				}
+			}
+			else{
+				cout << "Check for smoke." << endl;
+			}
+		}
+		else if(validOHWords.find(keyword) != validOHWords.end()){
+			if(!proOH){
+				cout << "Processing overheads..." << endl;
+				proOH = true;
+			}
+			this->createAuto(lineVec);
+		}
+		else if(lineVec[0] == "END" && lineVec[1] == "DESIGN"){
+			cout << "Importing DEF file done." << endl;
+			break;
+		}
+		else{
+			cout << "Unknown word." << endl;
+			return 0;
+		}
+	}
+
+	defFile.close();
+
+	return 1;
+}
+
+vector<string> splitFileLine(ifstream &inFile){
+	string lineIn;
+	char frontChar;
+
+	static vector<string> errorVec = {"\0"};
+
+	while(getline(inFile, lineIn)){
+		frontChar = (char)lineIn.front();
+		if(frontChar == '\n' || frontChar == '#' || frontChar == '\0'){			// skips commented and empty lines
+			//just loop
+		}
+		else{
+			return SplitStrVec(lineIn);
+		}
+	}
+	cout << "Extracting data file file error!!!" << endl;
+	return errorVec;
+}
+
+/**
+ * [def_file::to_str - displays the class data]
+ */
+
+void def_file::to_str(){
+	cout << "DEF file Class:" << endl;
 	cout << "\tDesign: " << this->DESIGN << endl;
 	cout << "\tUnits: " << this->unitsUnits << "  " << this->unitsVar << endl;
 	cout << "\tDie area(x,y): " << this->DIEAREA[0] << "  " << this->DIEAREA[1] << "  by  " << this->DIEAREA[2] << "  " << this->DIEAREA[3] << endl;
 
-	cout << "\tGCellGrid:" << endl;
-	cout << "\t\tX: start: " << this->GCGx[0] << "  count: " << this->GCGx[1] << "  step: " << this->GCGx[2] << endl;
-	cout << "\t\tY: start: " << this->GCGy[0] << "  count: " << this->GCGy[1] << "  step: " << this->GCGy[2] << endl;
-
-
-	cout << "\tROW: " << endl;
-	if(this->ROW.size() > 0){
-		for(int i = 0; i < this->ROW.size(); i++){
-			cout << "\t\tName: " << this->ROW[i].name << endl;
-			cout << "\t\tSite name: " << this->ROW[i].siteName << endl;
-			cout << "\t\tOrigin(x,y): " << this->ROW[i].origX << "  " << this->ROW[i].origY << endl;
-			cout << "\t\tNumber(x,y): " << this->ROW[i].numX << "  " << this->ROW[i].numY << endl;
-			cout << "\t\tStep(x,y): " << this->ROW[i].stepX << "  " << this->ROW[i].stepY << endl;
-		}
+	for(unsigned int i = 0; i < this->comps.size(); i++){
+		this->comps[i].to_str();
 	}
 
-	cout << "\tTRACKS: " << endl;
-	if(this->TRACKS.size() > 0){
-		for(int i = 0; i < this->TRACKS.size(); i++){
-			cout << "\t\tAxis: " << this->TRACKS[i].axis << endl;
-			cout << "\t\tStart: " << this->TRACKS[i].start << endl;
-			cout << "\t\tNumber: " << this->TRACKS[i].numtracks << endl;
-			cout << "\t\tSpace: " << this->TRACKS[i].space << endl;
-			cout << "\t\tLayer: " << this->TRACKS[i].LAYER << endl;
-		}
+	for(unsigned int i = 0; i < this->nets.size(); i++){
+		this->nets[i].to_str();
 	}
 
+	for(unsigned int i = 0; i < this->snets.size(); i++){
+		this->snets[i].to_str();
+	}
 }
 
-/** 
+/**
  * Components class functions
  */
 
-int def_component::compCnt = 0;
-
-def_component::def_component(vector<string> &inLine){
-	this->classID = this->compCnt++;
+int def_component::createAuto(vector<string> &inLine){
 	this->name = inLine[1];
 	this->compName = inLine[2];
 	this->posType = inLine[4];
-	// this->pt[0] = stoi(inLine[6]);
-	// this->pt[1] = stoi(inLine[7]);
 	this->pt[0] = (int)stod(inLine[6]);
 	this->pt[1] = (int)stod(inLine[7]);
 	this->orient = inLine[9];
+
+	return 1;
 }
 
 void def_component::to_str(){
 	cout << "Component Class:" << endl;
 	cout << "\tName: " << this->name << endl;
 	cout << "\tComponent: " << this->compName << endl;
-	cout << "\tIDno: " << this->classID << endl;
 	cout << "\tPosition type: " << this->posType << endl;
 	cout << "\tPosition(x,y): " << this->pt[0] << "  " << this->pt[1] << endl;
 	cout << "\t Orientation: " << this->orient << endl;
 }
 
-/** 
+/**
  * Net class functions
  */
 
-int def_net::netCnt = 0;
-
-def_net::def_net(vector<vector<string> > &inBlock){
-	this->classID = this->netCnt++;
+int def_net::createAuto(vector<vector<string> > &inBlock){
 	this->name = inBlock[0][1];
 	this->fromComp = inBlock[1][1];
 	this->fromPin = inBlock[1][2];
@@ -162,16 +229,17 @@ def_net::def_net(vector<vector<string> > &inBlock){
 
 	for(int i = 3; i < inBlock.size(); i++){
 		net_route tempRoute;
-
-		string tempChar = inBlock[i][0];
-		while(tempChar == "+" || tempChar == "ROUTED" || tempChar == "NEW"){
-			inBlock[i].erase(inBlock[i].begin());
-			tempChar = inBlock[i][0];
-		}
-
-		tempRoute.LAYER = inBlock[i][0];
+		string tempChar;
 
 		int k = 1;
+
+		tempChar = inBlock[i][0];
+		if(tempChar == "+"){
+			k++;
+		}
+
+		tempRoute.LAYER = inBlock[i][k++];
+
 		while(inBlock[i][k] == "("){
 			if(inBlock[i][++k] != "*")
 				tempRoute.ptX.push_back((int)stod(inBlock[i][k]));
@@ -194,16 +262,17 @@ def_net::def_net(vector<vector<string> > &inBlock){
 			}
 
 			k = k + 2;
-			tempChar = inBlock[i][k];
-			if(tempChar != "(" && tempChar != ";" && tempChar != "\0"){
-				tempRoute.VIA = inBlock[i][k];
-				break;
+			if(k < inBlock[i].size()){
+				tempChar = inBlock[i][k];
+				if(tempChar != "(" && tempChar != ";" && tempChar != "\0"){
+					tempRoute.VIA = inBlock[i][k];
+					break;
+				}
 			}
 		}
 		this->routes.push_back(tempRoute);
-		
 	}
-
+	return 1;
 }
 
 /**
@@ -221,7 +290,7 @@ float def_net::get_trans_delay(){
 				// Skips single point/dimension tracks, can be due to via placement
 				continue;
 			}
-	
+
 			trackLen += abs(this->routes[i].ptX[j] - this->routes[i].ptX[j-1]) *10;
 			trackLen += abs(this->routes[i].ptY[j] - this->routes[i].ptY[j-1]) *10;
 		}
@@ -233,7 +302,6 @@ float def_net::get_trans_delay(){
 void def_net::to_str(){
 	cout << "Net Class:" << endl;
 	cout << "\tName: " << this->name << endl;
-	cout << "\tIDno: " << this->classID << endl;
 
 	cout << "\tOrigin:" << endl;
 	cout << "\t\tComponent:" << this->fromComp << endl;
@@ -255,29 +323,30 @@ void def_net::to_str(){
 	}
 }
 
-/** 
+/**
  * Specialnet class functions
  */
 
-int def_specialNet::netCnt = 0;
-
-def_specialNet::def_specialNet(vector<vector<string> > &inBlock){
-	this->classID = this->netCnt++;
+ int def_net::createAutoSpecial(vector<vector<string> > &inBlock){
 	this->name = inBlock[0][1];
 
 	for(int i = 1; i < inBlock.size(); i++){
 		net_route tempRoute;
+		string tempChar;
+		int k;
 
-		string tempChar = inBlock[i][0];
-		while(tempChar == "+" || tempChar == "ROUTED" || tempChar == "NEW"){
-			inBlock[i].erase(inBlock[i].begin());
-			tempChar = inBlock[i][0];
+		k = 1;
+
+		tempChar = inBlock[i][0];
+		if(tempChar == "+"){
+			k++;
 		}
 
-		tempRoute.LAYER = inBlock[i][0];
-		tempRoute.trackWidth = stoi(inBlock[i][1]);
+		tempRoute.LAYER = inBlock[i][k++];
+		tempRoute.trackWidth = stoi(inBlock[i][k++]);
 
-		int k = 2;
+		disVector(inBlock[i]);
+
 		while(inBlock[i][k] == "("){
 			if(inBlock[i][++k] != "*")
 				tempRoute.ptX.push_back((int)stod(inBlock[i][k]));
@@ -300,36 +369,26 @@ def_specialNet::def_specialNet(vector<vector<string> > &inBlock){
 			}
 
 			k = k + 2;
-			tempChar = inBlock[i][k];
-			if(tempChar != "(" && tempChar != ";" && tempChar != "\0"){
-				tempRoute.VIA = inBlock[i][k];
-				break;
+
+			unsigned int fooSize;
+			fooSize = inBlock[i].size();
+
+			if(k >= fooSize){
+				k = inBlock[i].size() - 1;
 			}
+			// unsigned int fooSize;
+			// fooSize = inBlock[i].size();
+
+			// if(k < fooSize){
+			// 	tempChar = inBlock[i][k];
+			// 	if(tempChar != "(" && tempChar != ";" && tempChar != "\0"){
+			// 		tempRoute.VIA = inBlock[i][k];
+			// 		break;
+			// 	}
+			// }
 		}
 		this->routes.push_back(tempRoute);
-		
+
 	}
-
+	return 1;
 }
-
-void def_specialNet::to_str(){
-	cout << "SNet Class:" << endl;
-	cout << "\tName: " << this->name << endl;
-	cout << "\tIDno: " << this->classID << endl;
-
-	for(int i = 0; i < this->routes.size(); i++){
-		cout << "\tRoute:" << endl;
-		cout << "\t\tLayer: " << this->routes[i].LAYER << endl;
-		cout << "\t\tVIA: " << this->routes[i].VIA << endl;
-		cout << "\t\tWidth: " << this->routes[i].trackWidth << endl;
-		cout << "\t\tPoints(x,y):" << endl;
-		for(int j = 0; j < this->routes[i].ptX.size(); j++){
-			cout << "\t\t\t" << this->routes[i].ptX[j];
-			cout << "\t" << this->routes[i].ptY[j] << endl;
-		}
-	}
-}
-
-// void def_specialNet::get_route(vector<net_route> &VecOut){
-// 	VecOut = this->routes;
-// }

@@ -4,7 +4,7 @@
  * For:					Supertools, Coldflux Project - IARPA
  * Created: 		2019-03-30
  * Modified:
- * license: 
+ * license:
  * Description: Class for storing .def
  * File:				ClassDef.hpp
  */
@@ -17,36 +17,18 @@
 #include <vector>
 #include <cmath> 		 // abs
 #include <iomanip>
+#include <set>
 #include "die2sim/genFunc.hpp"
 
 using namespace std;
 
-/** 
- *  OverHeads Class
- */
+class def_component;
+class def_net;
 
-struct OH_row{
-	string name = "\0";
-	string siteName = "\0";
-	int origX = -1;
-	int origY = -1;
-	int numX = -1;
-	int numY = -1;
-	int stepX = -1;
-	int stepY = -1;
-};
+vector<string> splitFileLine(ifstream &inFile);
 
-struct OH_tracks{
-	string axis = "\0";
-	int start = -1;
-	int numtracks = -1;
-	int space = -1;
-	string LAYER = "\0";
-};
-
-class def_OverHeads{
+class def_file{
 	private:
-//		int classID;
 		string name = "\0";
 
 		string DESIGN;
@@ -59,27 +41,32 @@ class def_OverHeads{
 		static int no_rows;
 		static int no_tracks;
 
-		// GCELLGRID
-		int GCGx[3] = {0};
-		int GCGy[3] = {0};
+		vector<def_component> comps;
+		vector<def_net> nets;
+		vector<def_net> snets;
 
-		vector<OH_row> ROW;
-		vector<OH_tracks> TRACKS;
+		set<string> validOHWords = {"DESIGN", "UNITS", "DIEAREA", "ROW", "TRACKS", "GCELLGRID"};
+		set<string> validNBlkWords = {"COMPONENTS", "SPECIALNETS", "NETS"};
+
+		void createAuto(vector<string> &inLine);
 
 	public:
-		def_OverHeads();
-		void createAuto(vector<string> &inLine);
+		def_file(){};
+		~def_file(){};
+		int importFile(string fileName);
+
+		vector<def_component> getComps(){return this->comps;};
+		vector<def_net> getNets(){return this->nets;};
+
 		void to_str();
 };
 
-/** 
+/**
  *  Components Class
  */
 
 class def_component{
 	private:
-		static int compCnt;
-		int classID;
 		string name = "\0";
 		string compName = "\0";
 		string posType = "\0";
@@ -87,8 +74,11 @@ class def_component{
 		string orient = "\0";
 
 	public:
-		def_component(vector<string> &inLine);
-		// void createAuto(vector<string> &inLine);
+		def_component(){};
+		~def_component(){};
+
+		int createAuto(vector<string> &inLine);
+
 		string get_varName(){return name;}
 		string get_varCompName(){return compName;}
 		int get_varCorX(){return pt[0];}
@@ -96,7 +86,7 @@ class def_component{
 		void to_str();
 };
 
-/** 
+/**
  *  Nets Class
  */
 
@@ -104,7 +94,7 @@ struct net_route{
 	string LAYER = "\0";
 	string VIA = "\0";
 
-	int trackWidth = -1;
+	unsigned int trackWidth = 0;
 
 	vector<int> ptX;
 	vector<int> ptY;
@@ -112,7 +102,6 @@ struct net_route{
 
 class def_net{
 	private:
-		int classID;
 		string name = "\0";
 
 		// Master? compName pinName
@@ -128,10 +117,13 @@ class def_net{
 		// tracks
 		std::vector<net_route> routes;
 
-		static int netCnt;
 	public:
-		def_net(vector<vector<string> > &inBlock);
-		// void createAuto(vector<string> &inLine);
+		def_net(){};
+		~def_net(){};
+
+		int createAuto(vector<vector<string> > &inBlock);
+		int createAutoSpecial(vector<vector<string> > &inBlock); // use with special nets
+
 		void to_str();
 		void get_route(vector<net_route> &VecOut){VecOut = this->routes;};
 		string get_varName(){return name;}
@@ -143,27 +135,6 @@ class def_net{
 		string get_varToPin(){return ToPin;}
 
 		float get_trans_delay();
-};
-
-/** 
- *  Specialnets Class
- */
-
-class def_specialNet{
-	private:
-		int classID;
-		string name = "\0";
-
-		// tracks
-		std::vector<net_route> routes;
-
-		static int netCnt;
-	public:
-		def_specialNet(vector<vector<string> > &inBlock);
-		// void createAuto(vector<string> &inLine);
-		void to_str();
-		void get_route(vector<net_route> &VecOut){VecOut = this->routes;};
-		string get_varName(){return name;}
 };
 
 #endif

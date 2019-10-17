@@ -4,7 +4,7 @@
  * For:					Supertools, Coldflux Project - IARPA
  * Created: 		2019-04-25
  * Modified:
- * license: 
+ * license:
  * Description: Passer to create a JoSIM file.
  * File:				ParserJosim.cpp
  */
@@ -18,18 +18,18 @@ int JoSimFile::no_JoSim_classes = 0;
  * @return [1 - all good; 0 - error]
  */
 
-int JoSimFile::genCir(){
-	cout << "Creating JoSIM file -> " << this->fileNameOut << endl;
+int JoSimFile::genCir(string fileName){
+	cout << "Creating JoSIM file -> " << fileName << endl;
 
 	// import the sub-circuits
 	cout << "Importing:" << endl;
 	for(int i = 0; i < this->fileNamesImport.size(); i++){
 		cout << "  [" << i + 1 << "]: " << this->fileNamesImport[i] << endl;
-		cpFile(this->fileNamesImport[i], this->fileNameOut);
+		cpFile(this->fileNamesImport[i], fileName);
 	}
 
 	FILE *outFile;
-  outFile = fopen(this->fileNameOut.c_str(), "a");
+  outFile = fopen(fileName.c_str(), "a");
 
 
   // Create a sub-circuit of LEF file
@@ -53,7 +53,7 @@ int JoSimFile::genCir(){
   // ends the sub-circuit of LEF file
   string foo = ".ends " + this->subcktName + "\n";
   fputs(foo.c_str(), outFile);
-  
+
   fclose(outFile);
 
 	return 1;
@@ -146,13 +146,13 @@ int JoSimFile::appendSubcktPort(string netName, string netDes){
 string JoSimFile::createSubcktHeader(){
 	string subcktStr = "* ";
 	for(unsigned int i = 0; i < this->subcktNetDes.size(); i++){
-	  subcktStr += "\t" + subcktNetDes[i]; 
+	  subcktStr += "\t" + subcktNetDes[i];
 	}
-  
+
   subcktStr += "\n.SUBCKT " + this->subcktName;
 
   for(unsigned int i = 0; i < this->subcktNetName.size(); i++){
-	  subcktStr += "\t" + subcktNetName[i]; 
+	  subcktStr += "\t" + subcktNetName[i];
 	}
 
 	return subcktStr;
@@ -200,10 +200,10 @@ int cpFile(string fromFile, string toFile){
   	return 0;
   }
 
-  c = fgetc(inFile); 
-  while(c != EOF){ 
-	  fputc(c, outFile); 
-	  c = fgetc(inFile); 
+  c = fgetc(inFile);
+  while(c != EOF){
+	  fputc(c, outFile);
+	  c = fgetc(inFile);
   }
 
   fclose(inFile);
@@ -227,7 +227,7 @@ string makeHeader(string HeaderName){
 		foo = foo + "=";
 	}
 
-	foo = foo + " " + HeaderName + " "; 
+	foo = foo + " " + HeaderName + " ";
 
 	for(int i = 0; i < (74 - HeaderName.length())/2-1; i++){
 		foo = foo + "=";

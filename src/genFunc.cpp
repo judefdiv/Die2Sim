@@ -4,7 +4,7 @@
  * For:					Supertools, Coldflux Project - IARPA
  * Created: 		2019-03-20
  * Modified:
- * license: 
+ * license:
  * Description: Useful general functions.
  * File:				genFunc.cpp
  */
@@ -46,7 +46,7 @@ void stringSplitVec(vector<string> &inVec, string inStr){
 	// int k;
 
 	inVec.clear();
-	
+
 	inStr = cleanWhite(inStr);						// remove whitespaces
 
 	WSposOld = 0;
@@ -62,7 +62,38 @@ void stringSplitVec(vector<string> &inVec, string inStr){
 		if(WSpos >= StrLen) break;
 	}
 
-  inVec.push_back("\0");									
+  inVec.push_back("\0");
+}
+
+/**
+ * SplitStrVec - sperates the string by white spaces
+ * @param  inStr [The input string that needs to be separated by whitespaces]
+ */
+
+vector<string> SplitStrVec(string inStr){
+	size_t WSpos = 0;													//Whitespace position
+	size_t WSposOld = 0;
+	size_t StrLen = 0;
+	string tempDis;
+
+	vector<string> fooVec;
+
+	inStr = cleanWhite(inStr);								// remove whitespaces
+
+	WSposOld = 0;
+	StrLen = inStr.length();
+	int j = 0;
+	while(j < 64){														// extracts the data into a string array
+		WSpos = inStr.find(" ", WSposOld);
+		if(WSpos > StrLen) WSpos = StrLen;
+
+		fooVec.push_back(inStr.substr(WSposOld, WSpos - WSposOld));
+		WSposOld = WSpos + 1;
+
+		if(WSpos >= StrLen) break;
+	}
+
+	return fooVec;
 }
 
 /**
@@ -146,7 +177,7 @@ string cleanWhite(string inStr){
 		// cout << "found double whitespace" << endl;
 		tempStr.erase(wsPos, 1);
 		wsPos = tempStr.find("  ");
-	}	
+	}
 
 	//Removes trailing whitespaces
 	tempChar = (char)tempStr.back();

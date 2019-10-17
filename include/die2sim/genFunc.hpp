@@ -4,7 +4,7 @@
  * For:					Supertools, Coldflux Project - IARPA
  * Created: 		2019-03-20
  * Modified:
- * license: 
+ * license:
  * Description: Useful general functions.
  * File:				genFunc.hpp
  */
@@ -28,6 +28,7 @@ void printLineArrayF(float disArray[], int arrLen);
 #define LEFmaxParam 14
 
 void stringSplitVec(vector<string> &inVec, string inStr);
+vector<string> SplitStrVec(string inStr);
 void disVector(vector<string> &inVec);
 void disVectorBlk(vector<vector<string> > &inBlock);
 void progressBar(unsigned int currentVal, unsigned int totalVal);

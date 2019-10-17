@@ -4,7 +4,7 @@
  * For:					Supertools, Coldflux Project - IARPA
  * Created: 		2019-04-25
  * Modified:
- * license: 
+ * license:
  * Description: Passer to create a JoSIM file.
  * File:				ParserJosim.hpp
  */
@@ -26,7 +26,6 @@ using namespace std;
 
 class JoSimFile{
 	private:
-		string fileNameOut;
 		vector<string> fileNamesImport;
 		vector<string> placeComp;
 		vector<string> placeNet;
@@ -40,16 +39,15 @@ class JoSimFile{
 
 	public:
 		JoSimFile(){no_JoSim_classes++;};
-		void setFileNameOut(string fileName){fileNameOut = fileName;};
-		
-		void createAuto(vector<vector<string> > &inBlock);
+
+		// void createAuto(vector<vector<string> > &inBlock);
 		int importCir(string fileName);
 		int addComp(string compName, string compType, vector<string> &nets);
 		int addTrans(string netName, vector<string> &nets, float impe, float tDelay);
 		int createSubckt(string inName){subcktName = inName; return 1;};
 		int appendSubcktPort(string netName, string netDes);
-	
-		int genCir();
+
+		int genCir(string fileName);
 		void to_str();
 };
 

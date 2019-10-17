@@ -4,7 +4,7 @@
  * For:					Supertools, Coldflux Project - IARPA
  * Created: 		2019-03-20
  * Modified:
- * license: 
+ * license:
  * Description: Parser for .def
  * File:				ParserDef.cpp
  */
@@ -25,7 +25,7 @@ int defimport(string defFileName){
 	string keyword;
 	bool proOH = false;
 
-	cout << "Importing DEF file -> "  << defFileName << endl; 
+	cout << "Importing DEF file -> "  << defFileName << endl;
 
 	defFile.open(defFileName);
 
@@ -39,10 +39,15 @@ int defimport(string defFileName){
 		// disVector(lineVec);
 		if(validNBlkWords.find(keyword) != validNBlkWords.end()){
 			if(keyword == "COMPONENTS"){
-				cout << "Processing components..." << endl; 
+				cout << "Processing components..." << endl;
 				def_cl_comps.reserve(stoi(lineVec[1])); //set size of the vector, may improve performance?
 				proNewLineDef(lineVec);
+
+				vector<string> splitFileLine(ifstream &inFile)
+
 				while(lineVec[0] != "END"){
+
+
 					def_component tempComp(lineVec);
 					def_cl_comps.push_back(tempComp);
 					// tempComp.to_str();
@@ -50,12 +55,12 @@ int defimport(string defFileName){
 				}
 			}
 			else if(keyword == "SPECIALNETS"){
-				cout << "Processing special nets..." << endl; 
+				cout << "Processing special nets..." << endl;
 				def_cl_snets.reserve(stoi(lineVec[1])); //set size of the vector, may improve performance?
-				
+
 
 				proNewLineDef(lineVec);
-				while(lineVec[0] != "END" && lineVec[1] != "SPECIALNETS"){ 
+				while(lineVec[0] != "END" && lineVec[1] != "SPECIALNETS"){
 					while(lineVec[lineVec.size()-2] != ";"){
 						strBlock.push_back(lineVec);
 						proNewLineDef(lineVec);
@@ -78,13 +83,13 @@ int defimport(string defFileName){
 
 			}
 			else if(keyword == "NETS"){
-				cout << "Processing nets..." << endl; 
+				cout << "Processing nets..." << endl;
 				def_cl_nets.reserve(stoi(lineVec[1])); //set size of the vector, may improve performance?
-				
+
 
 				proNewLineDef(lineVec);
-				while(lineVec[0] != "END" && lineVec[1] != "NETS"){ 
-					while(lineVec[lineVec.size()-2] != ";"){	
+				while(lineVec[0] != "END" && lineVec[1] != "NETS"){
+					while(lineVec[lineVec.size()-2] != ";"){
 						strBlock.push_back(lineVec);
 						proNewLineDef(lineVec);
 					}
@@ -104,7 +109,7 @@ int defimport(string defFileName){
 		}
 		else if(validOHWords.find(keyword) != validOHWords.end()){
 			if(!proOH){
-				cout << "Processing overheads..." << endl; 
+				cout << "Processing overheads..." << endl;
 				proOH = true;
 			}
 			def_OHs.createAuto(lineVec);
@@ -116,7 +121,7 @@ int defimport(string defFileName){
 		else{
 			cout << "Unknown word." << endl;
 			return 0;
-		}			
+		}
 	}
 
 	defFile.close();
@@ -141,6 +146,35 @@ void disDEFdata(){
 	// for(unsigned int i = 0; i < def_cl_snets.size(); i++) def_cl_snets[i].to_str();
 }
 
+
+
+/**
+ * [proNewLineDef - process/splits a line from preopen text file]
+ * @param  inFile [The opened file pointer]
+ * @return        [The next line from the file split into a vector]
+ */
+
+vector<string> splitFileLine(ifstream &inFile){
+	string lineIn;
+	char frontChar;
+
+	while(getline(defFile, lineIn)){
+		frontChar = (char)lineIn.front();
+		if(frontChar == '\n' || frontChar == '#' || frontChar == '\0'){			// skips commented and empty lines
+			//just loop
+		}
+		else{
+			return SplitStrVec(lineIn);
+		}
+	}
+	cout << "Extracting data file file error!!!" << endl;
+}
+
+/**
+ * [proNewLineDef description]
+ * @param  inVec [description]
+ * @return       [description]
+ */
 
 int proNewLineDef(vector<string> &inVec){
 	string lineIn;

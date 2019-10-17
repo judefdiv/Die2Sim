@@ -3,7 +3,7 @@
 # For:					Supertools, Coldflux Project - IARPA
 # Created: 		2019-05-09
 # Modified:
-# license: 
+# license:
 # Description: Configuration file for defining stuffs
 # File:				 config.toml
 
@@ -12,13 +12,8 @@
 # Optional run parameters which can be utilised instead of CLI parameters
 [run_parameters]
 	# current possible commands: gds; josim; decipherer
-	Command     = "gds"
-	# Command     = "josim"
+	Command     = "josim"
 
-	# Decipherer
-	# deciFileName = ""
-
-	# Output file
 	# outFileName = "data/results/JoSIM_HASH_KSA4_route_opt.cir"
 
 	# ----------------------------------------------------------------------------
@@ -26,7 +21,7 @@
 	# ----------------------------------------------------------------------------
 
 	lefFileName = "data/lefdef/SUN/lef_2_metals.lef"
-	
+
 	# Kogge-Stone adders
 	defFileName = "data/lefdef/SUN/KSA4_route.def"
 	# defFileName = "data/lefdef/SUN/KSA8_route.def"
@@ -69,6 +64,21 @@
 	# defFileName = "data/lefdef/USC/ID8s_route_opt.def"
 	# defFileName = "data/lefdef/USC/ID16s_route_opt.def"
 
+[NETLIST_LOCATIONS]
+	LSMITLL_AND2T   = "data/cell_lib/LSmitll/LSMITLL_AND2T.subcir"
+	LSmitll_DCSFQ   = "data/cell_lib/LSmitll/LSMITLL_DCSFQ.subcir"
+	LSMITLL_DFFT    = "data/cell_lib/LSmitll/LSMITLL_DFFT.subcir"
+	LSmitll_MERGET  = "data/cell_lib/LSmitll/LSMITLL_MERGET.subcir"
+	LSMITLL_NOTT    = "data/cell_lib/LSmitll/LSMITLL_NOTT.subcir"
+	LSMITLL_OR2T    = "data/cell_lib/LSmitll/LSMITLL_OR2T.subcir"
+	MITLL_SPLITT    = "data/cell_lib/LSmitll/LSMITLL_SPLITT.subcir"
+	LSMITLL_XORT    = "data/cell_lib/LSmitll/LSMITLL_XORT.subcir"
+	# LSmitll_SFQDC1  =
+	# LSMITLL_JTLT    =
+	# LSMITLL_NDROT   =
+	# "data/cell_lib/LSmitll/LSMITLL_PTLTX.subcir"
+	# "data/cell_lib/LSmitll/LSMITLL_DCSFQ.subcir"
+	# "data/cell_lib/LSmitll/LSMITLL_PTLRX.subcir"
 
 # The arrays shows the pins of the cells for the SPICE sub-circuits.
 # The order of the pins/ports are important due to mapping
@@ -86,79 +96,8 @@
 	LSMITLL_XORT    = ["IN_CLK", "IN_1", "IN_2", "OUT"]
 	PAD             = ["P1"]																		# does NOT EXIST, used for mapping in/out pins
 
-# GDS file location of the cell library
-[LSmitll_GDS_File_Location]
-	NETLIST = "data/cell_lib/LSmitll/LSmitll_all.cir"
-	DFFT    = "data/cell_lib/LSmitll/LSmitll_DFFT.gds"
-	JTLT    = "data/cell_lib/LSmitll/LSmitll_jtlt.gds"
-	MERGET  = "data/cell_lib/LSmitll/LSmitll_MERGET.gds"
-	NOTT    = "data/cell_lib/LSmitll/LSmitll_NOTT.gds"
-	SPLITT  = "data/cell_lib/LSmitll/LSmitll_SPLITT.gds"
-	AND2T   = "data/cell_lib/LSmitll/LSmitll_AND2T.gds"
-	OR2T    = "data/cell_lib/LSmitll/LSmitll_OR2T.gds"
-	XOR2T   = "data/cell_lib/LSmitll/LSmitll_XORT.gds"
-	NDROT   = "data/cell_lib/LSmitll/LSmitll_NDROT.gds"
-
-# use only when LED/DEF was developed for a cell library
-[LSmitll_LEF2GDS_Ref_Name]
-	NOTT      = "LSmitll_NOTT"
-	DFFT      = "LSmitll_DFFT"
-	JTLT      = "LSmitll_jtlt"
-	SPLITT    = "LSmitll_SPLITT"
-	MERGET    = "LSmitll_MERGET"
-	AND2T     = "LSmitll_AND2T"
-	XOR2T     = "LSmitll_XORT"
-	OR2T      = "LSmitll_OR2T"
-	NDRO      = "LSmitll_NDROT"
-	# MUX21     = ""
-	# PAD       = ""
-	# SPLITCLK0 = ""
-	# SPLITCLK1 = ""
-	# SPLITCLK2 = ""
-	# SPLITCLK3 = ""
-	# SPLITCLK4 = ""
-	# SPLITCLK5 = ""
-	# SPLITCLK6 = "" 
-	# SPLITCLK7 = ""
-	# SPLITT = "SPLITT"
-	# DFFT   = "DFFT"
-
 # Basic translator for USC to LSMITLL. Used in JoSIM
 [USC2LSmitll]
-	# AND2       = "LSMITLL_AND2T"
-	# DCSFQ      = "LSmitll_DCSFQ"
-	# DFF        = "LSMITLL_DFFT"
-	# JTL        = "LSMITLL_JTLT"
-	# Merge      = "LSmitll_MERGET"
-	# NDRO       = "LSMITLL_NDROT"
-	# NOT        = "LSMITLL_NOTT"
-	# OR2        = "LSMITLL_OR2T"
-	# SFQDC      = "LSmitll_SFQDC1"
-	# XOR2a      = "LSMITLL_XORT"
-	# SPLITTER   = "MITLL_SPLITT"
-	# SPLITCLK0  = "MITLL_SPLITT"
-	# SPLITCLK1  = "MITLL_SPLITT"
-	# SPLITCLK2  = "MITLL_SPLITT"
-	# SPLITCLK3  = "MITLL_SPLITT"
-	# SPLITCLK4  = "MITLL_SPLITT"
-	# SPLITCLK5  = "MITLL_SPLITT"
-	# SPLITCLK6  = "MITLL_SPLITT"
-	# SPLITCLK7  = "MITLL_SPLITT"
-	# PAD        = "PAD"
-	# P1         = "P1"
-	# IN_CLK     = "IN_CLK"
-	# IN_A       = "IN_1"
-	# IN_B       = "IN_2"
-	# IN_IN      = "IN"
-	# OUT_OUT    = "OUT"
-	# OUT_CLK    = "??"
-	# IN_CLK_S   = "IN"
-	# OUT_OUT1   = "OUT_1"
-	# OUT_OUT2   = "OUT_2"
-	# OUT_CLK1   = "OUT_1"
-	# OUT_CLK2   = "OUT_2"
-	# IN_SET     = "IN"
-	
 	AND2T     = "LSMITLL_AND2T"
 	# DCSFQT  = "LSmitll_DCSFQ"
 	DFFT      = "LSMITLL_DFFT"
