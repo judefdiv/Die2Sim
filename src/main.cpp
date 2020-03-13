@@ -12,18 +12,15 @@
 #include <iostream>				//stream
 #include <string>					//string goodies
 #include <set>
-#include <map>
+// #include <map>
 
-// #include "die2sim/ToJosim.hpp"
 #include "die2sim/genFunc.hpp"
-// #include "die2sim/ClassDef.hpp"
 #include "toml/toml.hpp"
 #include "die2sim/ToJosim.hpp"
 
-#define versionNo 1.0
-#define configFile "config.toml"
-#define outFolder "data/results/"
-#define outFolderJoSIM "data/results/josim/"
+#define versionNo 0.9
+#define parameterFile "config.toml"
+
 using namespace std;
 
 /**
@@ -33,7 +30,6 @@ using namespace std;
 void welcomeScreen();
 void helpScreen();
 int RunTool(int argCount, char** argValues);
-int RunToolFromConfig();
 
 /**
  * Main loop
@@ -60,10 +56,9 @@ int RunTool(int argCount, char** argValues){
 		return 0;
 	}
 
-	set<string> validCommands = {"-j", "-v", "-h", "-c"};
+	set<string> validCommands = {"-j", "-d", "-v", "-h"};
 
 	string outFName = "\0";			// The output file, which is follow by the -o parameter
-	string lefFName = "\0";			// The LEF file
 	string defFName = "\0";			// The DEF file
 	string command  = "\0";			// The command to be executed
 
@@ -81,17 +76,17 @@ int RunTool(int argCount, char** argValues){
 		}
 	}
 	if(!command.compare("\0")){
-		cout << "Invalid." << endl;
+		cout << "Invalid command." << endl;
 		return 0;
 	}
 
-	// search for .lef
-	for(int i = 0; i < argCount; i++){
-		foo = string(argValues[i]);
-	  if(foo.find(".lef")!=string::npos){
-	  	lefFName = foo;
-	  }
-	}
+	// // search for .lef
+	// for(int i = 0; i < argCount; i++){
+	// 	foo = string(argValues[i]);
+	//   if(foo.find(".lef")!=string::npos){
+	//   	lefFName = foo;
+	//   }
+	// }
 
 	// search for .def
 	for(int i = 0; i < argCount; i++){
@@ -114,18 +109,17 @@ int RunTool(int argCount, char** argValues){
 	// auto assign output filename if non has been set
 	if(!outFName.compare("\0") && defFName.compare("\0")){
 		if(!command.compare("-j")){
-			outFName = fileRenamer(defFName, outFolderJoSIM, ".cir");
+			outFName = fileExtensionRenamer(defFName, ".cir");;
 		}
 	}
-
 
 	// --------------------------------------------------------------------
 	// ------------------------------ Commands ----------------------------
 	// --------------------------------------------------------------------
+
 	if(!command.compare("-j")){
 		if(defFName.compare("\0") && outFName.compare("\0")){
-			// runJoSIM(lefFName, defFName, outFName);
-			executeDef2Josim("config.toml", defFName, "judescir.ir");
+			executeDef2Josim(parameterFile, defFName, outFName);
 			return 1;
 		}
 		else {
@@ -133,12 +127,19 @@ int RunTool(int argCount, char** argValues){
 			return 0;
 		}
 	}
-	else if(!command.compare("-c")){
-		if(argCount == 1 + 1){
-			return RunToolFromConfig();
+	else if(!command.compare("-d")){
+		if(defFName.compare("\0") && outFName.compare("\0")){
+
+			def_file defFileIn;
+			defFileIn.importFile(defFName);
+			defFileIn.to_jpg(outFName);
+
+			return 1;
 		}
-		cout << "Input argument error." << endl;
-		return 0;
+		else {
+			cout << "Input argument error." << endl;
+			return 0;
+		}
 	}
 	else if(!command.compare("-v")){
 		if(argCount == 1 + 1){
@@ -162,77 +163,13 @@ int RunTool(int argCount, char** argValues){
 	return 0;
 }
 
-
-/**
- * [RunToolFromConfig - Runs the tools using parameters from config.toml]
- * @return [1 - all good; 0 - error]
- */
-
-int RunToolFromConfig(){
-	cout << "Importing execution parameters from config.toml" << endl;
-
-	const auto mainConfig  = toml::parse(configFile);
-	map<string, string> run_para = toml::get<map<string, string>>(mainConfig.at("run_parameters"));
-
-	map<string, string>::iterator it_run_para;
-
-	string outFName = "\0";
-	string lefFName = "\0";
-	string defFName = "\0";
-	string command  = "\0";
-
-	it_run_para = run_para.find("Command");
-	if(it_run_para != run_para.end()){
-		command = it_run_para->second;
-	}
-	else{
-		cout << "Invalid parameters." << endl;
-		return 0;
-	}
-
-	it_run_para = run_para.find("defFileName");
-	if(it_run_para != run_para.end()){
-		defFName = it_run_para->second;
-	}
-
-	it_run_para = run_para.find("outFileName");
-	if(it_run_para != run_para.end()){
-		outFName = it_run_para->second;
-	}
-
-	if(!outFName.compare("\0") && defFName.compare("\0")){
-		if(!command.compare("josim")){
-			outFName = fileRenamer(defFName, outFolderJoSIM, ".cir");
-		}
-	}
-
-	if(!command.compare("josim")){
-		if(defFName.compare("\0") && outFName.compare("\0")){
-			// runJoSIM(lefFName, defFName, outFName);
-			def_file deffile;
-			deffile.importFile(defFName);
-			deffile.to_str();
-			return 1;
-		}
-		else {
-			cout << "Input argument error." << endl;
-			return 0;
-		}
-	}
-	else{
-		cout << "Invalid command." << endl;
-		return 0;
-	}
-
-	return 0;
-}
-
-
 void helpScreen(){
 	cout << "===============================================================================" << endl;
 	cout << "Usage: Die2Sim [ OPTION ] [ filenames ]" << endl;
 	cout << "-j(oSIM)      Converts LEF/DEF to .cir then simulates it through JoSIM." << endl;
-	cout << "                [.def file] [.def file] -o [.cir file]" << endl;
+	cout << "                [.def file] -o [.cir file]" << endl;
+	cout << "-d(ot)        Converts LEF/DEF to a tree diagram." << endl;
+	cout << "                [.def file] -o [.jpg file]" << endl;
 	cout << "-c(onfig)     Runs the tools using the parameters in the config.toml file." << endl;
 	cout << "-v(ersion)    Displays the version number." << endl;
 	cout << "-h(elp)       Help screen." << endl;

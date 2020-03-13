@@ -12,26 +12,21 @@
 #ifndef joSim
 #define joSim
 
-#define configFile "config.toml"
+// #define configFile "config.toml"
 
 #include "toml/toml.hpp"
 #include <iostream>
 #include <fstream>
 #include <math.h>
 #include <unordered_map>
-#include <map>
+// #include <map>
+//
 #include "die2sim/ParserJosim.hpp"
-
-#include "die2sim/ClassDef.hpp"
-// #include "die2sim/ParserDef.hpp"
-
+#include "die2sim/ParserDef.hpp"
 #include "die2sim/genFunc.hpp"
+
 using namespace std;
 
-
-// -----------------------------------------------------------------------
-// --------------------------------- NEW ---------------------------------
-// -----------------------------------------------------------------------
 
 int executeDef2Josim(string ConfigFileName, string DefFileName, string cirFileName);
 
@@ -65,21 +60,5 @@ class def2josim{
     int genCir(string fileName);
     int ptlStats();               // is this the right place for it?
 };
-
-// -----------------------------------------------------------------------
-// ------------------------------- Legacy --------------------------------
-// -----------------------------------------------------------------------
-
-// int runJoSIM(string lefFileName, string defFileName, string cirFileName);
-
-// int stitchNets(string defFileName);
-
-// // int subcktPinLoc(string compName, string pinName);
-// int subcktPinNo(string cellName);
-// int subcktPinLoc(string cellName, string pinName);
-// string USC2LSmitll(string LSmitllStr);
-// string USC2LSmitllPin(string compName, string pinName);
-
-// int ptlStats(string defFileName);
 
 #endif

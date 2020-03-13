@@ -10,10 +10,7 @@ project(Die2Sim)                                  # creates ${PROJECT_NAME}
 
 set(SOURCES
   src/main.cpp
-  # src/ClassLef.cpp
-  # src/ParserLef.cpp
-  src/ClassDef.cpp
-  # src/ParserDef.cpp
+  src/ParserDef.cpp
   src/ToJosim.cpp
   src/ParserJosim.cpp
   src/genFunc.cpp

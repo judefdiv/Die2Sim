@@ -1,5 +1,5 @@
 # Die2Sim
-Die2Sim is a tool used to aid simulations of large scale superconducting circuits. The main usage of the tool is to create GDSII and JoSIM files from LEF/DEF files using an existing cell library.
+Die2Sim is a tool used to aid simulations of large scale superconducting circuits. The main usage of Die2Sim is to create JoSIM files from a DEF file using an existing cell library.
 
 Due to the leniency of the syntax of the LEF/DEF file, Die2Sim was designed to use the files generated from Bookshelf (qPalace USC).
 
@@ -7,33 +7,23 @@ Due to the leniency of the syntax of the LEF/DEF file, Die2Sim was designed to u
 Version: 0.9
 
 ## Features
-* LEF/DEF interpretation
-* GDS to ASCII
-* Easily create GDS file
-* Importing GDS files
-* Draw GDS file
-* Create JoSIM files
-* Convert LEF/DEF to GDS
-* Convert LEF/DEF to JoSIM
+* Create JoSIM files.
+* Convert DEF to JoSIM.
+* Create flow diagram of the circuit.
 
-## Examples
-Examples of how to execute Die2Sim:
+## Getting Started
 
-### LEF/DEF to JoSIM
+### Prerequisites
+
+The following packages is required to successfully compile and execute Die2Sim.
+
 ``` bash
-./Die2Sim -j lefExample.lef defExample.def -o josimOutput.cir
-./Die2Sim -j lefExample.lef defExample.def # automatically assigns output filename
-```
-### Run Using Parameters from the config file
-``` bash
-./Die2Sim -c
+apt install build-essencials    # for compiling
+apt install graphviz            # for creating hierarchy diagram(dot file)
 ```
 
-## Needed stuffs
-``` bash
-apt install build-essencials 	# for compiling
-```
-## To Compile
+### Installation
+
 ``` bash
 # Current directory: Die2Sim root
 mkdir build && cd build
@@ -41,13 +31,27 @@ cmake ..
 make
 ```
 
+### Usage
+
+Examples of how to execute Die2Sim:
+
+#### DEF to JoSIM
+
+``` bash
+./Die2Sim -j defExample.def -o josimOutput.cir
+```
+
+#### DEF to JPG
+
+``` bash
+./Die2Sim -d defExample.def -o picOutput.jpg
+```
+
 
 ## Notes
-Author - JF de Villiers (Stellenbosch University)
+
 For IARPA contract SuperTools
 
 LEF: Library Exchange Format
-
-DEF: Design Exchange Format
 
 JoSIM: Superconductor Circuit Simulator

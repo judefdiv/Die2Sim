@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <iomanip> // for string float precision
 #include <sstream> // for string float precision
+#include <time.h>
 #include "die2sim/genFunc.hpp"
 
 using namespace std;
@@ -52,6 +53,7 @@ class JoSimFile{
 };
 
 int cpFile(string fromFile, string toFile);
-// string makeHeader(string HeaderName);
+string makeHeader(string HeaderName);
+string makeFileHeader(string someText);
 
 #endif

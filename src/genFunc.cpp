@@ -11,6 +11,31 @@
 
 #include "die2sim/genFunc.hpp"
 
+/**
+ * splitFileLine - Reads the next line in a text file and separates the string by whitespaces
+ * @param  inFile [The pointer to the text file]
+ * @return        [The cleaned vector string]
+ */
+
+vector<string> splitFileLine(ifstream &inFile){
+	string lineIn;
+	char frontChar;
+
+	static vector<string> errorVec = {"\0"};
+
+	while(getline(inFile, lineIn)){
+		frontChar = (char)lineIn.front();
+		if(frontChar == '\n' || frontChar == '#' || frontChar == '\0'){			// skips commented and empty lines
+			//just loop
+		}
+		else{
+			return SplitStrVec(lineIn);
+		}
+	}
+	cout << "Extracting data file file error!!!" << endl;
+	return errorVec;
+}
+
 bool isStrDig(string wannaDig){
 	int i = 0;
 	char tempChar;
@@ -229,6 +254,21 @@ string fileRenamer(string inName, string preFix, string suffix){
 
 	inName.erase(0, inName.find_last_of("/")+1);
 	foo = inName.insert(0, preFix);
+
+	inName.erase(inName.find_last_of("."), inName.length());
+	foo = inName.insert(inName.length(), suffix);
+	return foo;
+}
+
+/**
+ * [fileRenamer - Cleans up file name and able to prepend or append a string]
+ * @param  inName [Input file name]
+ * @param  suffix [The string to be added to the end]
+ * @return        [The modified string]
+ */
+
+string fileExtensionRenamer(string inName, string suffix){
+	string foo;
 
 	inName.erase(inName.find_last_of("."), inName.length());
 	foo = inName.insert(inName.length(), suffix);

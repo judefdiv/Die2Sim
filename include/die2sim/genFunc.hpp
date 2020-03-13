@@ -27,6 +27,7 @@ void printLineArrayF(float disArray[], int arrLen);
 
 #define LEFmaxParam 14
 
+vector<string> splitFileLine(ifstream &inFile);
 void stringSplitVec(vector<string> &inVec, string inStr);
 vector<string> SplitStrVec(string inStr);
 void disVector(vector<string> &inVec);
@@ -35,6 +36,7 @@ void progressBar(unsigned int currentVal, unsigned int totalVal);
 string cleanWhite(string inStr);
 string removeLTwhite(string inStr);
 string fileRenamer(string inName, string preFix, string suffix);
+string fileExtensionRenamer(string inName, string suffix);
 string makeHeader(string HeaderName);
 
 #endif

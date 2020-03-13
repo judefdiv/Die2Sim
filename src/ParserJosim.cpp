@@ -21,6 +21,12 @@ int JoSimFile::no_JoSim_classes = 0;
 int JoSimFile::genCir(string fileName){
 	cout << "Creating JoSIM file -> " << fileName << endl;
 
+  FILE *outFile;
+  outFile = fopen(fileName.c_str(), "w");
+
+  fputs(makeFileHeader("asdf").c_str(), outFile);
+  fclose(outFile);
+
 	// import the sub-circuits
 	cout << "Importing:" << endl;
 	for(int i = 0; i < this->fileNamesImport.size(); i++){
@@ -28,7 +34,6 @@ int JoSimFile::genCir(string fileName){
 		cpFile(this->fileNamesImport[i], fileName);
 	}
 
-	FILE *outFile;
   outFile = fopen(fileName.c_str(), "a");
 
 
@@ -194,7 +199,7 @@ int cpFile(string fromFile, string toFile){
   	return 0;
   }
 
-  outFile = fopen(toFile.c_str(), "w");
+  outFile = fopen(toFile.c_str(), "a");
 	if(inFile==NULL){
   	cout << "Could not create \"" << toFile.c_str() << "\" for copying" << endl;
   	return 0;
@@ -236,4 +241,18 @@ string makeHeader(string HeaderName){
 	foo = foo + "\n* ==========================================================================\n\n";
 
 	return foo;
+}
+
+string makeFileHeader(string someText){
+  // string foo;
+
+  time_t rawtime;
+  struct tm * timeinfo;
+
+  time (&rawtime);
+  timeinfo = localtime(&rawtime);
+
+  // foo = "* JoSIM file generated using Die2Sim at: " + (string)asctime(timeinfo);
+
+  return "* JoSIM file generated using Die2Sim at: " + (string)asctime(timeinfo);
 }
