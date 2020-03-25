@@ -517,10 +517,34 @@ double def_net::get_trans_delay(){
 		}
 	}
 
-	cout << "L: " << trackLen << endl;
-	cout << "f: " << this->speedConstant << endl;
+	// cout << "L: " << trackLen << endl;
+	// cout << "f: " << this->speedConstant << endl;
 
 	return trackLen * this->speedConstant;
+}
+
+/**
+ * [def_net::get_track_length - calculates the length of the track in nm]
+ * @return [description]
+ */
+
+unsigned int def_net::get_track_length(){
+  unsigned int trackLen = 0;
+
+  for(unsigned int i = 0; i < this->routes.size(); i++){
+
+    for(unsigned int j = 1; j < this->routes[i].ptX.size(); j++){
+      if(routes[i].ptX.size() == 1){    // can be omitted
+        // Skips single point/dimension tracks, can be due to via placement
+        continue;
+      }
+
+      trackLen += abs(this->routes[i].ptX[j] - this->routes[i].ptX[j-1]) *10;
+      trackLen += abs(this->routes[i].ptY[j] - this->routes[i].ptY[j-1]) *10;
+    }
+  }
+
+  return trackLen;
 }
 
 void def_net::to_str(){

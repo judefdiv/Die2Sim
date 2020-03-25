@@ -11,8 +11,6 @@
 
 #include "die2sim/ParserJosim.hpp"
 
-int JoSimFile::no_JoSim_classes = 0;
-
 /**
  * [JoSimFile::genCir - Generates the final .cir file in the correct formate]
  * @return [1 - all good; 0 - error]
@@ -21,45 +19,74 @@ int JoSimFile::no_JoSim_classes = 0;
 int JoSimFile::genCir(string fileName){
 	cout << "Creating JoSIM file -> " << fileName << endl;
 
-  FILE *outFile;
-  outFile = fopen(fileName.c_str(), "w");
-
-  fputs(makeFileHeader("asdf").c_str(), outFile);
-  fclose(outFile);
-
-	// import the sub-circuits
-	cout << "Importing:" << endl;
-	for(int i = 0; i < this->fileNamesImport.size(); i++){
-		cout << "  [" << i + 1 << "]: " << this->fileNamesImport[i] << endl;
-		cpFile(this->fileNamesImport[i], fileName);
-	}
-
-  outFile = fopen(fileName.c_str(), "a");
+  /**
+   * Initialising the file
+   */
 
 
-  // Create a sub-circuit of LEF file
-  fputs(makeHeader(this->subcktName).c_str(), outFile);
-  fputs(this->createSubcktHeader().c_str(), outFile);
+  ofstream cirFile;
 
-  // creating components
-  fputs(makeHeader("Components").c_str(), outFile);
-  for(unsigned int i = 0; i < this->placeComp.size(); i++){
-	  fputs(this->placeComp[i].c_str(), outFile);
-	  fputs("\n", outFile);
+  cirFile.open(fileName, fstream::out);
+  if(!cirFile){
+    cout << "Could not create \"" << fileName << "\"" << endl;
+    return 0;
   }
 
-  // Creates transmission lines
-  fputs(makeHeader("Transmission Lines").c_str(), outFile);
-  for(unsigned int i = 0; i < this->placeNet.size(); i++){
-	  fputs(this->placeNet[i].c_str(), outFile);
-	  fputs("\n", outFile);
+  /**
+   * Creating header for the file
+   */
+
+  cirFile << makeFileHeader("");
+  cirFile.close();
+
+
+  /**
+   * Importing the gate circuit files
+   */
+
+  cout << "Importing:" << endl;
+  for(auto const &itFn :this->fileNamesImport){
+    int i = 0;
+    cout << "  [" << i++ << "]: " << itFn << endl;
+    cpFile(itFn, fileName);
   }
 
-  // ends the sub-circuit of LEF file
-  string foo = ".ends " + this->subcktName + "\n";
-  fputs(foo.c_str(), outFile);
 
-  fclose(outFile);
+  cirFile.open(fileName, fstream::out | std::fstream::app);
+
+  /**
+   * prepend the subcircui
+   */
+
+  cirFile << makeHeader(this->subcktName) << endl;
+  cirFile << this->createSubcktHeader() << endl;
+
+  /**
+   * Generating the components for the circuit
+   */
+
+  cirFile << makeHeader("Components") << endl;
+  for(auto &it: this->comps){
+    cirFile << it.to_cir() << endl;
+  }
+
+  /**
+   * Generating the PTLs for the components
+   */
+
+  cirFile << makeHeader("Passive Transmission Lines") << endl;
+  for(auto &it: this->PTLs){
+    cirFile << it.to_cir() << endl;
+  }
+
+  /**
+   * Append the circuit
+   */
+
+  cirFile << ".ends Created_subckt" << endl;
+  cirFile.close();
+
+  cout << "Creating JoSIM file: \"" << fileName << "\" done." << endl;
 
 	return 1;
 }
@@ -75,72 +102,41 @@ int JoSimFile::importCir(string fileName){
 };
 
 /**
- * [JoSimFile::addComp - Adds components to the file]
- * @param  compName [Name of component]
- * @param  compType [Name of the type of component]
- * @param  nets     [List of the connections]
- * @return          [1 - all good; 0 - error]
+ * [JoSimFile::pushComp - Adds a component]
+ * @param  name         [unique name of the component]
+ * @param  compTypeName [the component/subcircuit name]
+ * @param  netNames     [vector of all nets connected to the pins]
+ * @return              [0 - all good; 1 - error]
  */
 
-int JoSimFile::addComp(string compName, string compType, vector<string> &nets){
-	string netsStr = "";
+int JoSimFile::pushComp(string name, string compTypeName, vector<string> &netNames){
+  CompClass fooComp;
 
-	for(int i = 0; i < nets.size(); i++){
-		netsStr = netsStr + "\t\t" +nets[i];
-	}
+  fooComp.create(name, compTypeName, netNames);
+  this->comps.push_back(fooComp);
 
-	if(compType == "PAD"){
-		appendSubcktPort(nets[0], compName);
-	}
-	else {
-		this->placeComp.push_back("X" + compName + "\t\t" + compType + netsStr);
-	}
-
-	return 1;
+  if(!compTypeName.compare("PAD")){
+    this->subcktNetName.push_back(netNames.back());
+    this->subcktNetDes.push_back(name);
+  }
+  return 0;
 }
 
 /**
- * [JoSimFile::addTrans - Adds transmission lines to the file]
- * @param  netName [Name of the net]
- * @param  nets    [Size 4 vector of the connected nets]
- * @param  impe    [Route Impedance]
- * @param  tDelay  [Time delay value, must be in picoseconds]
- * @return         [1 - all good; 0 - error]
+ * [JoSimFile::pushPTL - Adds a PTL]
+ * @param  name    [unique name of the PTL]
+ * @param  netName [the name of the net]
+ * @param  len     [The length of the track in nm]
+ * @return         [0 - all good; 1 - error]
  */
 
-int JoSimFile::addTrans(string netName, vector<string> &nets, float impe, float tDelay){
-	string netsStr = "\t\t";
+int JoSimFile::pushPTL(const string &name, const string &netName, unsigned int len){
+  PTLclass fooPTL;
 
-	// setting precision
-	stringstream tDelayST;
-	stringstream impeST;
-	tDelayST << fixed << setprecision(2) << tDelay;
-	impeST << fixed << setprecision(2) << impe;
+  fooPTL.create(name, netName, len);
+  this->PTLs.push_back(fooPTL);
 
-
-	string paraStr = "\t\tLOSSLESS Z0=" + impeST.str() + "\tTD=" + tDelayST.str() + "p";
-
-	for(int i = 0; i < nets.size(); i++){
-		netsStr = netsStr + "\t\t" +nets[i];
-	}
-
-	this->placeNet.push_back("T" + netName + netsStr + paraStr);
-
-	return 1;
-}
-
-/**
- * [JoSimFile::appendSubcktPort description]
- * @param  netName [The name of the net connection]
- * @param  netDes  [Description of the net connection]
- * @return         [1 - all good; 0 - error]
- */
-
-int JoSimFile::appendSubcktPort(string netName, string netDes){
-	subcktNetName.push_back(netName);
-	subcktNetDes.push_back(netDes);
-
-	return 1;
+  return 0;
 }
 
 /**
@@ -181,6 +177,80 @@ void JoSimFile::to_str(){
 		cout << "[" << i << "]: " << this->placeComp[i] << endl;
 	}
 }
+
+
+/**
+ * [CompClass::create - Creates the class]
+ * @param  CompName     [The unique name of the component/subcircuit]
+ * @param  compTypeName [The subcircuit or component type]
+ * @param  netsIn       [The vectors of the nets connected to the component or subcircuit]
+ * @return              [0 - Good; 1 - Error]
+ */
+
+int CompClass::create(const string &CompName, const string &compTypeName, vector<string> netsIn){
+  this->name = CompName;
+  this->compType = compTypeName;
+  this->nets = netsIn;
+
+  return 0;
+}
+
+
+/**
+ * [CompClass::to_cir - creates the subcircuit instance for JoSIM]
+ * @return [The string in the format JoSIM requires]
+ */
+
+string CompClass::to_cir(){
+  stringstream ss;
+
+  ss << left;
+  ss << setw(20) << ("X" + this->name);
+  ss << setw(20) << compType;
+
+  for(auto const &it: this->nets){
+    ss << setw(7) << it;
+  }
+
+  return ss.str();
+}
+
+
+/**
+ * [PTLclass::create - Creates the class]
+ * @param  PTLname   [The name of the net/PTL]
+ * @param  NetName   [The net name]
+ * @param  PTLlength [The length of the PTL in nm]
+ * @return           [0 - Good; 1 - Error]
+ */
+
+int PTLclass::create(const string &PTLname, const string &NetName, int PTLlength){
+  this->name = PTLname;
+  this->nameNet = NetName;
+  this->length = PTLlength;
+
+  return 0;
+}
+
+/**
+ * [PTLclass::to_cir - creates the transmission line for JoSIM]
+ * @return [The string in the format JoSIM requires]
+ */
+
+string PTLclass::to_cir(){
+  stringstream ss;
+
+  ss << setw(7) << ("T" + this->name);
+  ss << setw(6) << (nameNet + "A");
+  ss << setw(4) << (0);
+  ss << setw(6) << (nameNet + "B");
+  ss << setw(4) << (0);
+  ss << setprecision(2);
+  ss << setw(0) << "  LOSSLESS Z0=5.00  TD=" << this->length * speedConstant <<  "p";
+
+  return ss.str();
+}
+
 
 /**
  * [cpFile - Copies one text file to another]
@@ -244,7 +314,7 @@ string makeHeader(string HeaderName){
 }
 
 string makeFileHeader(string someText){
-  // string foo;
+  string foo;
 
   time_t rawtime;
   struct tm * timeinfo;
@@ -252,7 +322,9 @@ string makeFileHeader(string someText){
   time (&rawtime);
   timeinfo = localtime(&rawtime);
 
-  // foo = "* JoSIM file generated using Die2Sim at: " + (string)asctime(timeinfo);
 
-  return "* JoSIM file generated using Die2Sim at: " + (string)asctime(timeinfo);
+  foo =  "* JoSIM file generated with Die2Sim, " + (string)asctime(timeinfo);
+  foo += "\n* Jude de Villiers, Stellenbosch University\n\n";
+
+  return foo;
 }

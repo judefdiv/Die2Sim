@@ -167,6 +167,7 @@ class def_net{
 		string get_varToPin(){return ToPin;}
 
 		double get_trans_delay();
+		unsigned int get_track_length();
 };
 
 #endif

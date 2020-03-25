@@ -25,7 +25,6 @@ int executeDef2Josim(string ConfigFileName, string DefFileName, string cirFileNa
 	def2josim defJosim;
 
 	defJosim.fetchData(ConfigFileName, DefFileName);
-	// defJosim.stitchCompNets();
 	defJosim.genCir(cirFileName);
 	// defJosim.ptlStats();
 
@@ -152,19 +151,14 @@ int def2josim::stitchCompNets(){
 	  	cout << "Component \"" << itNet.get_varToComp() << "\" not found." << endl;
 	  }
 
-	  net[0] = to_string(i) + "A";
-	  net[1] = "0";
-	  net[2] = to_string(i) + "B";
-	  net[3] = "0";
-
-	  joFile.addTrans(itNet.get_varName(), net, 5, itNet.get_trans_delay());
+	  joFile.pushPTL(itNet.get_varName(), to_string(i), itNet.get_track_length());
 	  i++;
 	}
 
 	cout << "Adding component to JoSIM class" << endl;
 
 	for(auto &[compName, data]: nets){
-		joFile.addComp(compName, USC2LSmitll(data.compType), data.nets);
+		joFile.pushComp(compName, USC2LSmitll(data.compType), data.nets);
 	}
 
 	return 0;
