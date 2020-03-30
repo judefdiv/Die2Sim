@@ -7,6 +7,11 @@
 # Description: Configuration file for defining stuffs
 # File:				 config.toml
 
+[Parameters]
+	defFileName = "./data/USC_new/KSA4_route.def"
+	cirFileName = "./data/USC_new/KSA4_routeNEW.cir"	# output file name
+	dotFileName = ""
+
 [NETLIST_LOCATIONS]
 	LSMITLL_AND2T   = "data/cell_lib/LSmitll/LSMITLL_AND2T.subcir"
 	LSmitll_DCSFQ   = "data/cell_lib/LSmitll/LSMITLL_DCSFQ.subcir"

@@ -26,7 +26,6 @@ int executeDef2Josim(string ConfigFileName, string DefFileName, string cirFileNa
 
 	defJosim.fetchData(ConfigFileName, DefFileName);
 	defJosim.genCir(cirFileName);
-	// defJosim.ptlStats();
 
 	return 1;
 }
@@ -54,6 +53,8 @@ int def2josim::fetchData(string ConfigFileName, string DefFileName){
 
 	def_file defFileIn;
 	defFileIn.importFile(DefFileName);
+
+	defFileIn.PTLstats();
 
 	this->defComps = defFileIn.getComps();
 	this->defNets = defFileIn.getNets();
@@ -160,57 +161,6 @@ int def2josim::stitchCompNets(){
 	for(auto &[compName, data]: nets){
 		joFile.pushComp(compName, USC2LSmitll(data.compType), data.nets);
 	}
-
-	return 0;
-}
-
-/**
- * [def2josim::ptlStats description]
- * @return [0 - Exit Success; 1 - Exit Failure]
- */
-
-int def2josim::ptlStats(){
-	// 	vector<def_net> def_cl_nets;
-	// // defimport(defFileName); // already called
-	// getNetVec(def_cl_nets);
-
-	// unsigned int lenMax = 0;				// Maximum length of the PTLs
-	// unsigned int lenMin = 10000;		// Minimum length of the PTLs
-	// float lenMean = 0;							// The mean/average length of the PTLs
-	// unsigned int lenCnt = 0;				// Number of PTLs
-	// unsigned long lenSum = 0;				// The sum of the PTL length
-	// float stdVar = 0; 							// Standards variance
-
-
-	// cout << "Calculating stats on the transmission lines." << endl;
-	// lenCnt = def_cl_nets.size();
-	// for(unsigned int i = 0; i < lenCnt; i++){
-	//   lenSum += def_cl_nets[i].get_trans_delay();
-
-	//   if(def_cl_nets[i].get_trans_delay() > lenMax)
-	//   	lenMax = def_cl_nets[i].get_trans_delay();
-
-	//   if(def_cl_nets[i].get_trans_delay() < lenMin)
-	//   	lenMin = def_cl_nets[i].get_trans_delay();
-	// }
-
-	// lenMean = (float)lenSum / (float)lenCnt;
-
-	// for(unsigned int i = 0; i < lenCnt; i++){
-	//   stdVar += pow((float)def_cl_nets[i].get_trans_delay() - lenMean, 2);
-	// }
-
-	// stdVar /= lenCnt;
-
-	// stdVar = sqrt(stdVar);
-
-	// cout << "PTLs:" << endl;
-	// cout << "\tCnt: "  << lenCnt << endl;
-	// cout << "\tMin: "  << lenMin << endl;
-	// cout << "\tMean: "  << lenMean << endl;
-	// cout << "\tMax: "  << lenMax << endl;
-	// cout << "\tTotal: "  << lenSum << endl;
-	// cout << "\tstdVar: "  << stdVar << endl;
 
 	return 0;
 }

@@ -12,7 +12,7 @@
 #include <iostream>				//stream
 #include <string>					//string goodies
 #include <set>
-// #include <map>
+#include <map>
 
 #include "die2sim/genFunc.hpp"
 #include "toml/toml.hpp"
@@ -29,6 +29,7 @@ using namespace std;
 
 void welcomeScreen();
 void helpScreen();
+int runFromFile(const string &fileName);
 int RunTool(int argCount, char** argValues);
 
 /**
@@ -56,12 +57,12 @@ int RunTool(int argCount, char** argValues){
 		return 0;
 	}
 
-	set<string> validCommands = {"-j", "-d", "-v", "-h"};
+	set<string> validCommands = {"-j", "-d", "-v", "-h", "-c"};
 
 	string outFName = "\0";			// The output file, which is follow by the -o parameter
 	string defFName = "\0";			// The DEF file
 	string command  = "\0";			// The command to be executed
-
+	string tomlFName = "\0";		// config file
 	string foo;
 
 	// --------------------------------------------------------------------
@@ -96,6 +97,13 @@ int RunTool(int argCount, char** argValues){
 	  }
 	}
 
+		for(int i = 0; i < argCount; i++){
+		foo = string(argValues[i]);
+	  if(foo.find(".toml")!=string::npos){
+	  	tomlFName = foo;
+	  }
+	}
+
 	// --------------------------------------------------------------------
 	// ------------------------ Output file naming ------------------------
 	// --------------------------------------------------------------------
@@ -121,6 +129,15 @@ int RunTool(int argCount, char** argValues){
 		if(defFName.compare("\0") && outFName.compare("\0")){
 			executeDef2Josim(parameterFile, defFName, outFName);
 			return 1;
+		}
+		else {
+			cout << "Input argument error." << endl;
+			return 0;
+		}
+	}
+	else if(!command.compare("-c")){
+		if(tomlFName.compare("\0")){
+			return runFromFile(tomlFName);
 		}
 		else {
 			cout << "Input argument error." << endl;
@@ -160,6 +177,65 @@ int RunTool(int argCount, char** argValues){
 	}
 
 	cout << "I am smelling smoke." << endl;
+	return 0;
+}
+
+int runFromFile(const string &fileName){
+	cout << "Importing execution parameters from config.toml" << endl;
+
+	const auto mainConfig  = toml::parse(fileName);
+	map<string, string> run_para = toml::get<map<string, string>>(mainConfig.at("Parameters"));
+
+	map<string, string>::iterator it_run_para;
+
+	string command  = "toJoSIM";
+	string defFName = "\0";
+	string outFName = "\0";
+	// string lefFName = "\0";			// .toml
+	// string workDir  = "";			  //
+
+	// it_run_para = run_para.find("Command");
+	// if(it_run_para != run_para.end()){
+	// 	command = it_run_para->second;
+	// }
+	// else{
+	// 	cout << "Invalid parameters." << endl;
+	// 	return 0;
+	// }
+
+	it_run_para = run_para.find("defFileName");
+	if(it_run_para != run_para.end()){
+		defFName = it_run_para->second;
+		// gdsFName = gdsFName.insert(0, workDir);
+	}
+
+	it_run_para = run_para.find("cirFileName");
+	if(it_run_para != run_para.end()){
+		outFName = it_run_para->second;
+		// bliFName = bliFName.insert(0, workDir);
+	}
+
+
+	if(!command.compare("toJoSIM")){
+		if(outFName.compare("\0") && defFName.compare("\0")){
+
+			// def_file defFileIn;
+			// defFileIn.importFile(defFName);
+			// defFileIn.to_jpg(outFName);
+
+
+			return executeDef2Josim(fileName, defFName, outFName);
+		}
+		else{
+			cout << "Input argument error." << endl;
+			return 0;
+		}
+	}
+	else{
+		cout << "Invalid command." << endl;
+		return 0;
+	}
+
 	return 0;
 }
 

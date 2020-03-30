@@ -60,6 +60,7 @@ class def_file{
 		vector<def_component> getComps(){return this->comps;};
 		vector<def_net> getNets(){return this->nets;};
 
+		int PTLstats();
 
 		int to_def(const string &fileName);
 		int to_jpg(const string &fileName);

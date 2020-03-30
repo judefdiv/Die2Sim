@@ -254,6 +254,56 @@ int def_file::importFile(const string &fileName){
 // }
 
 /**
+ * [def_file::PTLstats -  ]
+ * @return [0 - Exit Success; 1 - Exit Failure]
+ */
+
+int def_file::PTLstats(){
+
+  unsigned int lenMax = 0;       // Maximum length of the PTLs
+  unsigned int lenMin = 10000;   // Minimum length of the PTLs
+  float lenMean = 0;             // The mean/average length of the PTLs
+  unsigned int lenCnt = 0;       // Number of PTLs
+  unsigned long lenSum = 0;        // The sum of the PTL length
+  float stdVar = 0;              // Standards variance
+
+
+  cout << "Calculating stats on the transmission lines." << endl;
+  lenCnt = this->nets.size();
+  // for(unsigned int i = 0; i < lenCnt; i++){
+  for(auto itnet: this->nets){
+    lenSum += itnet.get_track_length();
+
+    if(itnet.get_track_length() > lenMax)
+     lenMax = itnet.get_track_length();
+
+    if(itnet.get_track_length() < lenMin)
+     lenMin = itnet.get_track_length();
+  }
+
+  lenMean = (float)lenSum / (float)lenCnt;
+
+  // for(unsigned int i = 0; i < lenCnt; i++){
+  for(auto itnet: this->nets){
+    stdVar += pow((float)itnet.get_track_length() - lenMean, 2);
+  }
+
+  stdVar /= lenCnt;
+
+  stdVar = sqrt(stdVar);
+
+  cout << "PTL Stats:" << endl;
+  cout << "\tCnt: "  << lenCnt << endl;
+  cout << "\tMin: "  << lenMin << endl;
+  cout << "\tMean: "  << lenMean << endl;
+  cout << "\tMax: "  << lenMax << endl;
+  cout << "\tTotal: "  << lenSum << endl;
+  cout << "\tstdVar: "  << stdVar << endl;
+
+  return 0;
+}
+
+/**
  * [def_file::to_def description]
  * @param  fileName [The file name of the to be created def file]
  * @return          [1 - Exit Success; 0 - Exit Failure]
