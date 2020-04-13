@@ -40,6 +40,10 @@ class def2josim{
     unordered_map<string, vector<string>> NetListPins;
     unordered_map<string, int> NetListPinNo;
 
+    // config parameters
+    float para_PTL_length = -1;
+    bool para_mergeIntoSubcir = true;
+
     // DEF file data
     vector<def_component> defComps;
     vector<def_net> defNets;

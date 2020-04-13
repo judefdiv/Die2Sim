@@ -3,8 +3,15 @@
 #  - cmake ..
 #  - make
 
-cmake_minimum_required(VERSION 2.6)
-project(Die2Sim)                                  # creates ${PROJECT_NAME}
+# cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.13.0)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+project(Die2Sim VERSION 0.9)
+# project(Die2Sim)                                  # creates ${PROJECT_NAME}
 
 # target_compile_features(Die2Sim PUBLIC cxx_std_17)
 

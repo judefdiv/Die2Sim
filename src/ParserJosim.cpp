@@ -45,9 +45,9 @@ int JoSimFile::genCir(string fileName){
    */
 
   cout << "Importing:" << endl;
+  int cntImport = 0;
   for(auto const &itFn :this->fileNamesImport){
-    int i = 0;
-    cout << "  [" << i++ << "]: " << itFn << endl;
+    cout << "  [" << cntImport++ << "]: " << itFn << endl;
     cpFile(itFn, fileName);
   }
 
@@ -58,8 +58,10 @@ int JoSimFile::genCir(string fileName){
    * prepend the subcircui
    */
 
-  cirFile << makeHeader(this->subcktName) << endl;
-  cirFile << this->createSubcktHeader() << endl;
+  if(mergeIntoSubcir){
+    cirFile << makeHeader(this->subcktName) << endl;
+    cirFile << this->createSubcktHeader() << endl;
+  }
 
   /**
    * Generating the components for the circuit
@@ -67,6 +69,12 @@ int JoSimFile::genCir(string fileName){
 
   cirFile << makeHeader("Components") << endl;
   for(auto &it: this->comps){
+    if(!it.getCompType().compare("pad")
+      || !it.getCompType().compare("PAD")
+      || !it.getCompType().compare("Pad")){
+      continue;
+    }
+
     cirFile << it.to_cir() << endl;
   }
 
@@ -74,21 +82,154 @@ int JoSimFile::genCir(string fileName){
    * Generating the PTLs for the components
    */
 
-  cirFile << makeHeader("Passive Transmission Lines") << endl;
-  for(auto &it: this->PTLs){
-    cirFile << it.to_cir() << endl;
-  }
+  /*********************************************************************
+   ***************************** IMPROVE *******************************
+   *********************************************************************/
 
+  cirFile << makeHeader("Passive Transmission Lines") << endl;
+  if(!mergeIntoSubcir){
+    bool foundPad;
+    for(auto &it: this->PTLs){
+      foundPad = false;
+      for(unsigned int i = 0; i < this->subcktNetName.size(); i++){
+      // for(auto &itSubCirNet: this->subcktNetName){
+        if(!this->subcktNetName[i].compare(it.getNameNet()+"A")){
+          cirFile << it.to_cir_replace_a_net(subcktNetDes[i]) << endl;
+          foundPad = true;
+          break;
+        }
+      }
+
+      if(!foundPad){
+        cirFile << it.to_cir() << endl;
+      }
+    }
+  }
+  else{
+    for(auto &it: this->PTLs){
+      cirFile << it.to_cir() << endl;
+    }
+  }
   /**
    * Append the circuit
    */
 
-  cirFile << ".ends Created_subckt" << endl;
+  if(mergeIntoSubcir){
+    cirFile << ".ends Created_subckt" << endl;
+  }
+  cirFile << this->genInstance();
+
   cirFile.close();
 
   cout << "Creating JoSIM file: \"" << fileName << "\" done." << endl;
 
 	return 1;
+}
+
+/**
+ * [JoSimFile::genInstance - creates the final bit of code that simulates the circuit]
+ * @return [The instance of the circuit that simulates it]
+ */
+
+string JoSimFile::genInstance(){
+  stringstream ss;
+
+  /**
+   * Reference to the subcircuit
+   */
+
+  ss << left;
+  ss << endl;
+
+  if(mergeIntoSubcir){
+    ss << "Xcircuit " << subcktName;
+    for(const auto &padNames: this->subcktNetDes){
+      ss << " " << padNames;
+    }
+
+    ss << endl << endl;
+  }
+
+  /**
+   * create the input for each pad
+   */
+
+  unsigned int inputCnt = 1;
+
+  for(const auto &itPad: this->subcktNetDes){
+
+    if(itPad.find("sum") != string::npos
+        || itPad.find("SUM") != string::npos
+        || itPad.find("Sum") != string::npos
+        || itPad.find("OUT") != string::npos
+        || itPad.find("Out") != string::npos
+        || itPad.find("out") != string::npos){
+      continue;
+    }
+
+    // current source
+    if(itPad.find("clk") != string::npos
+        || itPad.find("Clk") != string::npos
+        || itPad.find("CLK") != string::npos){
+      ss  << setw(16) << "I" + itPad << " 0 " << inputCnt << "000" << " pulse(0 600u 50p 10p 9p 1p 51p)" << endl;
+    }
+    else{
+      ss << setw(16) << "I" + itPad << " 0 " << inputCnt << "000" << " pwl(0 0 30p 0 35p 600u 40p 0)" << endl;
+    }
+
+    // DCSFQ
+    ss << setw(16) << "XDCSFQ" + itPad << setw(15) << " LSMITLL_DCSFQ " << inputCnt << "000 " << inputCnt << "001" << endl;
+
+    // JTL
+    ss << setw(16) << "XJTL" + itPad << setw(15) << " LSmitll_JTLT " << inputCnt << "001 " << itPad << endl;
+
+    ss << endl;
+
+    inputCnt++;
+  }
+
+  // outStream << left;
+  // outStream << setw(20) << ("X" + this->name);
+  // outStream << setw(20) << compType;
+
+
+  /**
+   * Add resistors to the output pads
+   */
+
+  for(const auto &itPad: this->subcktNetDes){
+    if(itPad.find("sum") != string::npos
+        || itPad.find("SUM") != string::npos
+        || itPad.find("Sum") != string::npos
+        || itPad.find("OUT") != string::npos
+        || itPad.find("Out") != string::npos
+        || itPad.find("out") != string::npos){
+      ss << "R" << itPad << " " << itPad << " 0 5" << endl;;
+    }
+  }
+
+  ss << endl;
+
+  /**
+   * Transient parameter
+   */
+
+  ss << ".tran 0.25p 1000p 0 0.25p" << endl;
+  ss << endl;
+
+  /**
+   * Printing the data
+   */
+
+  for(const auto &itPad: this->subcktNetDes){
+    ss << ".print NODEV " << itPad << " 0" << endl;
+  }
+
+  ss << endl << ".end";
+
+
+
+  return ss.str();
 }
 
 /**
@@ -241,7 +382,7 @@ string PTLclass::to_cir(){
   stringstream ss;
 
   ss << setw(7) << ("T" + this->name);
-  ss << setw(6) << (nameNet + "A");
+  ss << setw(10) << (nameNet + "A");
   ss << setw(4) << (0);
   ss << setw(6) << (nameNet + "B");
   ss << setw(4) << (0);
@@ -251,6 +392,19 @@ string PTLclass::to_cir(){
   return ss.str();
 }
 
+string PTLclass::to_cir_replace_a_net(string netAName){
+  stringstream ss;
+
+  ss << setw(7) << ("T" + this->name);
+  ss << setw(10) << netAName;
+  ss << setw(4) << (0);
+  ss << setw(6) << (nameNet + "B");
+  ss << setw(4) << (0);
+  ss << setprecision(2);
+  ss << setw(0) << "  LOSSLESS Z0=5.00  TD=" << this->length * speedConstant <<  "p";
+
+  return ss.str();
+}
 
 /**
  * [cpFile - Copies one text file to another]
@@ -275,6 +429,7 @@ int cpFile(string fromFile, string toFile){
   	return 0;
   }
 
+  fputc('\n', outFile);
   c = fgetc(inFile);
   while(c != EOF){
 	  fputc(c, outFile);

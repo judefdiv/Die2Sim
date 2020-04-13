@@ -40,16 +40,26 @@ int executeDef2Josim(string ConfigFileName, string DefFileName, string cirFileNa
 
 int def2josim::fetchData(string ConfigFileName, string DefFileName){
 
-	const auto mainConfig  = toml::parse(ConfigFileName);
-  this->NetListLoc = toml::get<unordered_map<string, string>>(mainConfig.at("NETLIST_LOCATIONS"));
-  this->USC2LSmitllMap = toml::get<unordered_map<string, string>>(mainConfig.at("USC2LSmitll"));
-  this->NetListPins = toml::get<unordered_map<string, vector<string>>>(mainConfig.at("LSmitll_netlist"));
+	const auto mainConfig      = toml::parse(ConfigFileName);
+	this->NetListLoc           = toml::get<unordered_map<string, string>>(mainConfig.at("NETLIST_LOCATIONS"));
+	this->USC2LSmitllMap       = toml::get<unordered_map<string, string>>(mainConfig.at("USC2LSmitll"));
+	this->NetListPins          = toml::get<unordered_map<string, vector<string>>>(mainConfig.at("LSmitll_netlist"));
+
+	const auto& tomlparameters = toml::find(mainConfig, "Parameters");
+	para_PTL_length            = toml::find<float>(tomlparameters, "fix_PTL_length");
+	para_mergeIntoSubcir			 = toml::find<bool>(tomlparameters, "merge_into_subcircuit");
 
   // Creates a map with the number of pins of each sub-circuit
 	unordered_map<string, vector<string>>::iterator it;
 	for(it = this->NetListPins.begin(); it != this->NetListPins.end(); it++){
 	  this->NetListPinNo.insert(pair<string,int>(it->first, it->second.size()));
 	}
+
+
+	/**
+	 * Should be a better place to put this...
+	 */
+
 
 	def_file defFileIn;
 	defFileIn.importFile(DefFileName);
@@ -76,6 +86,7 @@ int def2josim::genCir(string fileName){
 	}
 
 	joFile.createSubckt("Created_subckt");
+	joFile.setMergeIntoSubcir(para_mergeIntoSubcir);
 
 	this->stitchCompNets();
 
@@ -133,8 +144,8 @@ int def2josim::stitchCompNets(){
 		// from
 		auto nets_it = nets.find(itNet.get_varFromComp());
 		if(nets_it != nets.end()){
-			index = subcktPinLoc(USC2LSmitll(nets_it->second.compType), USC2LSmitll(itNet.get_varFromPin()));
-			// index = subcktPinLoc(USC2LSmitll(nets_it->second.compType), USC2LSmitllPin(nets_it->second.compType, itNet.get_varFromPin()));
+			// index = subcktPinLoc(USC2LSmitll(nets_it->second.compType), USC2LSmitll(itNet.get_varFromPin()));
+			index = subcktPinLoc(USC2LSmitll(nets_it->second.compType), USC2LSmitllPin(nets_it->second.compType, itNet.get_varFromPin()));
 	    nets_it->second.nets[index] = to_string(i) + "A";
 
 	  } else{
@@ -144,15 +155,21 @@ int def2josim::stitchCompNets(){
 		// must join
 		nets_it = nets.find(itNet.get_varToComp());
 		if(nets_it != nets.end()){
-			index = subcktPinLoc(USC2LSmitll(nets_it->second.compType), USC2LSmitll(itNet.get_varToPin()));
-			// index = subcktPinLoc(USC2LSmitll(nets_it->second.compType), USC2LSmitllPin(nets_it->second.compType, itNet.get_varToPin()));
+			// index = subcktPinLoc(USC2LSmitll(nets_it->second.compType), USC2LSmitll(itNet.get_varToPin()));
+			index = subcktPinLoc(USC2LSmitll(nets_it->second.compType), USC2LSmitllPin(nets_it->second.compType, itNet.get_varToPin()));
 	    nets_it->second.nets[index] = to_string(i) + "B";
 
 	  } else{
 	  	cout << "Component \"" << itNet.get_varToComp() << "\" not found." << endl;
 	  }
 
-	  joFile.pushPTL(itNet.get_varName(), to_string(i), itNet.get_track_length());
+	  if(this->para_PTL_length == -1){
+	  	joFile.pushPTL(itNet.get_varName(), to_string(i), itNet.get_track_length());
+	  }
+	  else {
+	  	joFile.pushPTL(itNet.get_varName(), to_string(i), para_PTL_length);
+	  }
+
 	  i++;
 	}
 
@@ -190,10 +207,14 @@ string def2josim::USC2LSmitll(string USCstr){
  * @param  pinName  [The string to be translated]
  * @return          [The translated string]
  */
+/**
+ * TO BE REMOVED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ */
 
 string def2josim::USC2LSmitllPin(string compName, string pinName){
-	if(!compName.compare("LSMITLL_SPLITT") && !pinName.compare("IN_CLK")){
-		return "IN";
+	// cout << "Looking for comp: " << compName << "  pin: " << pinName << endl;
+	if(!USC2LSmitll(compName).compare("LSmitll_SPLITT") && !pinName.compare("IN_CLK")){
+		return "a";
 	}
 
 	unordered_map<string, string>::iterator foo;
@@ -229,8 +250,8 @@ int def2josim::subcktPinLoc(string cellName, string pinName){
 
 	foo = it->second;
 
-	if(cellName == "LSMITLL_SPLITT" && pinName == "IN_CLK"){
-		pinName = "IN";
+	if(cellName == "LSmitll_SPLITT" && pinName == "IN_CLK"){
+		pinName = "a";
 	}
 
 	for(unsigned int i = 0; i < foo.size(); i++){

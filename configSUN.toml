@@ -10,25 +10,22 @@
 [File_Locations]
 	defFileName = "./data/USC_new/KSA4_route.def"
 	cirFileName = "./data/USC_new/KSA4_routeNEW.cir"	# output file name
-	# cirFileName = "/home/lynx/Downloads/ColdFlux/JoSIM-master2/KSA4.cir"	# output file name
 	dotFileName = ""
 
 [Parameters]
-	fix_PTL_length = 100000.0 			# -1: No modification of tracks/PTLs; 0>= sets a fixed track length
-	merge_into_subcircuit = false
+	fix_PTL_length = 10000.0 			# -1: No modification of tracks/PTLs; 0>= sets a fixed track length
 
 [NETLIST_LOCATIONS]
-	LSmitll_AND2T   = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_AND2T.cir"
-	LSmitll_DCSFQ   = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_DCSFQ.cir"
-	LSmitll_DFFT    = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_DFFT.cir"
-	LSmitll_MERGET  = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_MERGET.cir"
-	LSmitll_NOTT    = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_NOTT.cir"
-	LSmitll_OR2T    = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_OR2T.cir"
-	LSmitll_SPLITT  = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_SPLITT.cir"
-	LSmitll_XORT    = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_XORT.cir"
-	LSmitll_JTLT    =	"data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_jtlt.cir"
-	LSmitll_NDROT  =	"data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_NDROT.cir"
-
+	LSmitll_AND2T   = "data/cell_lib/RSFQ_LS_MITLL_1_4/LSmitll_AND2T.cir"
+	LSmitll_DCSFQ   = "data/cell_lib/RSFQ_LS_MITLL_1_4/LSmitll_DCSFQ.cir"
+	LSmitll_DFFT    = "data/cell_lib/RSFQ_LS_MITLL_1_4/LSmitll_DFFT.cir"
+	LSmitll_MERGET  = "data/cell_lib/RSFQ_LS_MITLL_1_4/LSmitll_MERGET.cir"
+	LSmitll_NOTT    = "data/cell_lib/RSFQ_LS_MITLL_1_4/LSmitll_NOTT.cir"
+	LSmitll_OR2T    = "data/cell_lib/RSFQ_LS_MITLL_1_4/LSmitll_OR2T.cir"
+	LSmitll_SPLITT  = "data/cell_lib/RSFQ_LS_MITLL_1_4/LSmitll_SPLITT.cir"
+	LSmitll_XORT    = "data/cell_lib/RSFQ_LS_MITLL_1_4/LSmitll_XORT.cir"
+	LSmitll_JTLT    =	"data/cell_lib/RSFQ_LS_MITLL_1_4/LSmitll_jtlt.cir"
+	LSmitll_NDROT  =	"data/cell_lib/RSFQ_LS_MITLL_1_4/LSmitll_NDROT.cir"
 # The arrays shows the pins of the cells for the SPICE sub-circuits.
 # The order of the pins/ports are important due to mapping
 [LSmitll_netlist]
@@ -46,43 +43,26 @@
 
 # Basic translator for USC to LSMITLL. Used in JoSIM
 [USC2LSmitll]
-	AND2      = "LSmitll_AND2T"
-	# DCSFQT  = "LSmitll_DCSFQ"
-	DFF       = "LSmitll_DFFT"
-	JTLT      = "LSmitll_JTLT"
-	Merge     = "LSmitll_MERGET"
-	# NDROT   = "LSMITLL_NDROT"
-	NOT       = "LSmitll_NOTT"
-	OR2       = "LSmitll_OR2T"
-	# SFQDCT  = "LSmitll_SFQDC1"
-	XOR2a     = "LSmitll_XORT"
-	SPLITT    = "LSmitll_SPLITT"
-	SPLITCLK0 = "LSmitll_SPLITT"
-	SPLITCLK1 = "LSmitll_SPLITT"
-	SPLITCLK2 = "LSmitll_SPLITT"
-	SPLITCLK3 = "LSmitll_SPLITT"
-	SPLITCLK4 = "LSmitll_SPLITT"
-	SPLITCLK5 = "LSmitll_SPLITT"
-	SPLITCLK6 = "LSmitll_SPLITT"
-	SPLITCLK7 = "LSmitll_SPLITT"
-	SPLITTER  = "LSmitll_SPLITT"
-	IN_A      = "a"
-	IN_B      = "b"
-	OUT_OUT   = "q"
-	IN_CLK    = "clk"
-	IN_SET    = "a"
-	OUT_CLK1  = "q"
-	OUT_CLK2  = "r"
-	OUT_OUT1  = "q"
-	OUT_OUT2  = "r"
-	IN_IN     = "a"
+	# Components
+	JTLT = "LSmitll_JTLT"
+	MERGET = "LSmitll_MERGET"
+	SPLIT = "LSmitll_SPLITT"
+	DFF = "LSmitll_DFFT"
+	NOTT = "LSmitll_NOTT"
+	AND2T = "LSmitll_AND2T"
+	OR2T = "LSmitll_OR2T"
+	XOR2T = "LSmitll_XORT"
+	PAD = "PAD"
 
-	# Older
-	PAD       = "PAD"
-	P1        = "P1"
+	# Pins
+	INOUT_1 = "P1" # just for pads
+	IN_1 = "a"
+	IN_2 = "b"
+	OUT_1 = "q"
+	OUT_2 = "r"
+	CLK = "clk"
 
-
-# # The arrays shows the names of the pins of the macros(cells) for in the LEF/DEF file.
+# The arrays shows the names of the pins of the macros(cells) for in the LEF/DEF file.
 # [USC_LEF]
 # 	PAD       = ["P1"]
 # 	AND2      = ["IN_A", "IN_B", "OUT_OUT", "IN_CLK", "OUT_CLK"]

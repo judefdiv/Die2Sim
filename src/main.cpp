@@ -184,7 +184,7 @@ int runFromFile(const string &fileName){
 	cout << "Importing execution parameters from config.toml" << endl;
 
 	const auto mainConfig  = toml::parse(fileName);
-	map<string, string> run_para = toml::get<map<string, string>>(mainConfig.at("Parameters"));
+	map<string, string> run_para = toml::get<map<string, string>>(mainConfig.at("File_Locations"));
 
 	map<string, string>::iterator it_run_para;
 

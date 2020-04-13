@@ -37,6 +37,7 @@ class JoSimFile{
 		vector<string> fileNamesImport;
 		vector<string> placeComp;
 		vector<string> placeNet;
+		bool mergeIntoSubcir = true;
 
 		string subcktName;
 		vector<string> subcktNetName;	// Net name of the pad
@@ -46,6 +47,7 @@ class JoSimFile{
 		vector<CompClass> comps;
 
 		string createSubcktHeader();
+		string genInstance();
 
 	public:
 		JoSimFile(){};
@@ -58,6 +60,9 @@ class JoSimFile{
 		int pushPTL(const string &name, const string &netName, unsigned int len);
 
 		int genCir(string fileName);
+
+		void setMergeIntoSubcir(bool inVal){mergeIntoSubcir = inVal;};
+
 		void to_str();
 };
 
@@ -73,6 +78,7 @@ class CompClass{
 		~CompClass(){};
 
 		int create(const string &CompName, const string &compTypeName, vector<string> netsIn);
+		string getCompType(){return this->compType;};
 		string to_cir();
 };
 
@@ -90,6 +96,8 @@ class PTLclass{
 
 		int create(const string &PTLname, const string &NetName, int PTLlength);
 		string to_cir();
+		string getNameNet(){return nameNet;};
+		string to_cir_replace_a_net(string netAName);
 };
 
 int cpFile(string fromFile, string toFile);
