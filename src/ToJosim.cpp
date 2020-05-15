@@ -46,8 +46,13 @@ int def2josim::fetchData(string ConfigFileName, string DefFileName){
 	this->NetListPins          = toml::get<unordered_map<string, vector<string>>>(mainConfig.at("LSmitll_netlist"));
 
 	const auto& tomlparameters = toml::find(mainConfig, "Parameters");
-	para_PTL_length            = toml::find<float>(tomlparameters, "fix_PTL_length");
-	para_mergeIntoSubcir			 = toml::find<bool>(tomlparameters, "merge_into_subcircuit");
+	para_dangling_net          = toml::find<string>(tomlparameters, "dangling_net_name");
+	para_PTL_length_bool       = toml::find<bool>(tomlparameters, "force_PTL_Length");
+	para_PTL_length            = toml::find<float>(tomlparameters, "force_PTL_length_value");
+	para_mergeIntoSubcir       = toml::find<bool>(tomlparameters, "merge_into_subcircuit");
+	input_keys                 = toml::find<vector<string>>(tomlparameters, "input_name_keys");
+	output_keys                = toml::find<vector<string>>(tomlparameters, "output_names_keys");
+	clock_keys                 = toml::find<vector<string>>(tomlparameters, "clock_names_keys");
 
   // Creates a map with the number of pins of each sub-circuit
 	unordered_map<string, vector<string>>::iterator it;
@@ -87,6 +92,7 @@ int def2josim::genCir(string fileName){
 
 	joFile.createSubckt("Created_subckt");
 	joFile.setMergeIntoSubcir(para_mergeIntoSubcir);
+	joFile.setNameKeys(input_keys, output_keys, clock_keys);
 
 	this->stitchCompNets();
 
@@ -125,7 +131,7 @@ int def2josim::stitchCompNets(){
 		net.resize(numberpins);
 
 		for(int j = 0; j < numberpins; j++){
-			net[j] = "????";
+			net[j] = para_dangling_net;
 		}
 
 		tempCompNet.compType = comp.getCompType();
@@ -163,7 +169,7 @@ int def2josim::stitchCompNets(){
 	  	cout << "Component \"" << itNet.get_varToComp() << "\" not found." << endl;
 	  }
 
-	  if(this->para_PTL_length == -1){
+	  if(para_PTL_length_bool == false){
 	  	joFile.pushPTL(itNet.get_varName(), to_string(i), itNet.get_track_length());
 	  }
 	  else {

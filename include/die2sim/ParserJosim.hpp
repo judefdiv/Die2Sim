@@ -37,7 +37,12 @@ class JoSimFile{
 		vector<string> fileNamesImport;
 		vector<string> placeComp;
 		vector<string> placeNet;
+		
 		bool mergeIntoSubcir = true;
+		vector<string> inputNameKeys;
+		vector<string> outputNameKeys;
+		vector<string> clockNameKeys;
+		vector<string> padNameKeys = {"PAD", "Pad", "pad"};
 
 		string subcktName;
 		vector<string> subcktNetName;	// Net name of the pad
@@ -62,6 +67,14 @@ class JoSimFile{
 		int genCir(string fileName);
 
 		void setMergeIntoSubcir(bool inVal){mergeIntoSubcir = inVal;};
+		void setNameKeys(vector<string> input, vector<string> output, vector<string> clock){
+			inputNameKeys = input;
+			outputNameKeys = output;
+			clockNameKeys = clock;
+		};
+
+		bool fuzzySearch(string word, vector<string> keys); // can be made independent
+
 
 		void to_str();
 };

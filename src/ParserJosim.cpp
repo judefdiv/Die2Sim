@@ -69,9 +69,12 @@ int JoSimFile::genCir(string fileName){
 
   cirFile << makeHeader("Components") << endl;
   for(auto &it: this->comps){
-    if(!it.getCompType().compare("pad")
-      || !it.getCompType().compare("PAD")
-      || !it.getCompType().compare("Pad")){
+    // if(!it.getCompType().compare("pad")
+    //   || !it.getCompType().compare("PAD")
+    //   || !it.getCompType().compare("Pad")){
+    //   continue;
+    // }
+    if(fuzzySearch(it.getCompType(), padNameKeys)){
       continue;
     }
 
@@ -153,24 +156,19 @@ string JoSimFile::genInstance(){
   /**
    * create the input for each pad
    */
+  
+  ss << makeHeader("Inputs") << endl;
 
   unsigned int inputCnt = 1;
 
   for(const auto &itPad: this->subcktNetDes){
 
-    if(itPad.find("sum") != string::npos
-        || itPad.find("SUM") != string::npos
-        || itPad.find("Sum") != string::npos
-        || itPad.find("OUT") != string::npos
-        || itPad.find("Out") != string::npos
-        || itPad.find("out") != string::npos){
+    if(fuzzySearch(itPad, outputNameKeys) == true){
       continue;
     }
 
     // current source
-    if(itPad.find("clk") != string::npos
-        || itPad.find("Clk") != string::npos
-        || itPad.find("CLK") != string::npos){
+    if(fuzzySearch(itPad, clockNameKeys)){
       ss  << setw(16) << "I" + itPad << " 0 " << inputCnt << "000" << " pulse(0 600u 50p 10p 9p 1p 51p)" << endl;
     }
     else{
@@ -181,7 +179,7 @@ string JoSimFile::genInstance(){
     ss << setw(16) << "XDCSFQ" + itPad << setw(15) << " LSMITLL_DCSFQ " << inputCnt << "000 " << inputCnt << "001" << endl;
 
     // JTL
-    ss << setw(16) << "XJTL" + itPad << setw(15) << " LSmitll_JTLT " << inputCnt << "001 " << itPad << endl;
+    ss << setw(16) << "XJTL" + itPad << setw(15) << " LSmitll_ptltx " << inputCnt << "001 " << itPad << endl;
 
     ss << endl;
 
@@ -196,30 +194,46 @@ string JoSimFile::genInstance(){
   /**
    * Add resistors to the output pads
    */
+  
+  ss << makeHeader("Outputs") << endl;
+
+  // for(const auto &itPad: this->subcktNetDes){
+  //   if(fuzzySearch(itPad, outputNameKeys) == true){
+  //     // ss << "R" << itPad << " " << itPad << " 0 5" << endl;
+  //     ss << "X" << itPad << " LSmitll_ptlrx " << itPad << " " << itPad << endl;
+  //   }
+  // }
+
 
   for(const auto &itPad: this->subcktNetDes){
-    if(itPad.find("sum") != string::npos
-        || itPad.find("SUM") != string::npos
-        || itPad.find("Sum") != string::npos
-        || itPad.find("OUT") != string::npos
-        || itPad.find("Out") != string::npos
-        || itPad.find("out") != string::npos){
-      ss << "R" << itPad << " " << itPad << " 0 5" << endl;;
+  static int i = 0;
+    if(fuzzySearch(itPad, outputNameKeys) == true){
+      // ss << "R" << itPad << " " << itPad << " 0 5" << endl;
+      ss << "X" << itPad << " LSmitll_ptlrx " << this->subcktNetName[i] << " " << itPad << endl;
     }
+    i++;
   }
 
-  ss << endl;
+  // for(unsigned int i = 0; i < this->subcktNetDes.size(); i++){
+  //   if(fuzzySearch(this->subcktNetDes[i], outputNameKeys) == true){
+  //     // ss << "R" << itPad << " " << itPad << " 0 5" << endl;
+  //     ss << "X" << this->subcktNetDes[i] << " LSmitll_ptlrx " << this->subcktNetName[i] << " " << this->subcktNetDes[i] << endl;
+  //   }
+  // }
 
   /**
    * Transient parameter
    */
 
+  ss << makeHeader("Control") << endl;
+
   ss << ".tran 0.25p 1000p 0 0.25p" << endl;
-  ss << endl;
 
   /**
    * Printing the data
    */
+  
+  ss << makeHeader("Prints") << endl;
 
   for(const auto &itPad: this->subcktNetDes){
     ss << ".print NODEV " << itPad << " 0" << endl;
@@ -227,9 +241,24 @@ string JoSimFile::genInstance(){
 
   ss << endl << ".end";
 
-
-
   return ss.str();
+}
+
+/**
+ * [JoSimFile::fuzzySearch - searching a string with a set(vector) of keys]
+ * @param  word [The string in which much be searched]
+ * @param  keys [vector of key words to search for]
+ * @return      [true if found else false]
+ */
+bool JoSimFile::fuzzySearch(string word, vector<string> keys){
+
+  for(const auto &key: keys){
+    if(word.find(key) != string::npos){
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /**
@@ -381,13 +410,14 @@ int PTLclass::create(const string &PTLname, const string &NetName, int PTLlength
 string PTLclass::to_cir(){
   stringstream ss;
 
-  ss << setw(7) << ("T" + this->name);
-  ss << setw(10) << (nameNet + "A");
-  ss << setw(4) << (0);
-  ss << setw(6) << (nameNet + "B");
-  ss << setw(4) << (0);
+  ss << left;
+  ss << setw(10) << "T" + this->name;
+  ss << setw(10) << nameNet + "A";
+  ss << setw(4) << 0;
+  ss << setw(6) << nameNet + "B";
+  ss << setw(4) << 0;
   ss << setprecision(2);
-  ss << setw(0) << "  LOSSLESS Z0=5.00  TD=" << this->length * speedConstant <<  "p";
+  ss << setw(0) << "  Z0=5.00  TD=" << this->length * speedConstant <<  "p";
 
   return ss.str();
 }
@@ -395,13 +425,14 @@ string PTLclass::to_cir(){
 string PTLclass::to_cir_replace_a_net(string netAName){
   stringstream ss;
 
-  ss << setw(7) << ("T" + this->name);
+  ss << left;
+  ss << setw(10) << ("T" + this->name);
   ss << setw(10) << netAName;
   ss << setw(4) << (0);
   ss << setw(6) << (nameNet + "B");
   ss << setw(4) << (0);
   ss << setprecision(2);
-  ss << setw(0) << "  LOSSLESS Z0=5.00  TD=" << this->length * speedConstant <<  "p";
+  ss << setw(0) << "  Z0=5.00  TD=" << this->length * speedConstant <<  "p";
 
   return ss.str();
 }

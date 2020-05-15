@@ -8,14 +8,29 @@
 # File:				 config.toml
 
 [File_Locations]
-	defFileName = "./data/USC_new/KSA4_route.def"
-	cirFileName = "./data/USC_new/KSA4_routeNEW.cir"	# output file name
+	# defFileName = "./data/USC_new/KSA4_route.def"
+	# cirFileName = "./data/USC_new/KSA4_routeNEW.cir"	# output file name
 	# cirFileName = "/home/lynx/Downloads/ColdFlux/JoSIM-master2/KSA4.cir"	# output file name
-	dotFileName = ""
+	# dotFileName = ""
+
+	# defFileName = "./data/USC_new/arrmult4_route.def"
+	# cirFileName = "./data/USC_new/arrmult4.cir"	# output file name
+
+	# defFileName = "./data/USC_new/fa.def"
+	# cirFileName = "./data/USC_new/fa.cir"	# output file name
+
+  defFileName = "./KSA4_v1p5_route.def"
+	cirFileName = "./KSA4_v1p5_route.cir"	# output file name
+ #  dotFileName = "./KSA4_SUN.jpg"
 
 [Parameters]
-	fix_PTL_length = 100000.0 			# -1: No modification of tracks/PTLs; 0>= sets a fixed track length
-	merge_into_subcircuit = false
+	dangling_net_name			 = "0"
+	force_PTL_Length       = false
+	force_PTL_length_value = 100000.0 			# -1: No modification of tracks/PTLs; 0> = sets a fixed track length
+	merge_into_subcircuit  = false
+	input_name_keys        = ["IN", "In", "in", "a", "b", "CLK", "Clk", "clk"]
+	output_names_keys      = ["SUM", "Sum", "sum", "OUT", "Out", "out", "q"] # Primarily used
+	clock_names_keys       = ["CLK", "Clk", "clk", "CLOCK", "Clock", "clock"]
 
 [NETLIST_LOCATIONS]
 	LSmitll_AND2T   = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_AND2T.cir"
@@ -27,7 +42,9 @@
 	LSmitll_SPLITT  = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_SPLITT.cir"
 	LSmitll_XORT    = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_XORT.cir"
 	LSmitll_JTLT    =	"data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_jtlt.cir"
-	LSmitll_NDROT  =	"data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_NDROT.cir"
+	LSmitll_NDROT   =	"data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_NDROT.cir"
+	LSmitll_PLTTX   =	"data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_PTLTX.cir"
+	LSmitll_PLTRX   =	"data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_PTLRX.cir"
 
 # The arrays shows the pins of the cells for the SPICE sub-circuits.
 # The order of the pins/ports are important due to mapping
@@ -46,40 +63,64 @@
 
 # Basic translator for USC to LSMITLL. Used in JoSIM
 [USC2LSmitll]
-	AND2      = "LSmitll_AND2T"
-	# DCSFQT  = "LSmitll_DCSFQ"
-	DFF       = "LSmitll_DFFT"
-	JTLT      = "LSmitll_JTLT"
-	Merge     = "LSmitll_MERGET"
-	# NDROT   = "LSMITLL_NDROT"
-	NOT       = "LSmitll_NOTT"
-	OR2       = "LSmitll_OR2T"
-	# SFQDCT  = "LSmitll_SFQDC1"
-	XOR2a     = "LSmitll_XORT"
-	SPLITT    = "LSmitll_SPLITT"
-	SPLITCLK0 = "LSmitll_SPLITT"
-	SPLITCLK1 = "LSmitll_SPLITT"
-	SPLITCLK2 = "LSmitll_SPLITT"
-	SPLITCLK3 = "LSmitll_SPLITT"
-	SPLITCLK4 = "LSmitll_SPLITT"
-	SPLITCLK5 = "LSmitll_SPLITT"
-	SPLITCLK6 = "LSmitll_SPLITT"
-	SPLITCLK7 = "LSmitll_SPLITT"
-	SPLITTER  = "LSmitll_SPLITT"
-	IN_A      = "a"
-	IN_B      = "b"
-	OUT_OUT   = "q"
-	IN_CLK    = "clk"
-	IN_SET    = "a"
-	OUT_CLK1  = "q"
-	OUT_CLK2  = "r"
-	OUT_OUT1  = "q"
-	OUT_OUT2  = "r"
-	IN_IN     = "a"
 
-	# Older
-	PAD       = "PAD"
-	P1        = "P1"
+
+	JTLT = "LSmitll_JTLT"
+	MERGET = "LSmitll_MERGET"
+	SPLIT = "LSmitll_SPLITT"
+	DFF = "LSmitll_DFFT"
+	NOTT = "LSmitll_NOTT"
+	AND2T = "LSmitll_AND2T"
+	OR2T = "LSmitll_OR2T"
+	XOR2T = "LSmitll_XORT"
+	PAD = "PAD"
+
+	# Pins
+	INOUT_1 = "P1" # just for pads
+	IN_1 = "a"
+	IN_2 = "b"
+	OUT_1 = "q"
+	OUT_2 = "r"
+	CLK = "clk"
+
+
+
+
+
+	# AND2      = "LSmitll_AND2T"
+	# # DCSFQT  = "LSmitll_DCSFQ"
+	# DFF       = "LSmitll_DFFT"
+	# JTLT      = "LSmitll_JTLT"
+	# Merge     = "LSmitll_MERGET"
+	# # NDROT   = "LSMITLL_NDROT"
+	# NOT       = "LSmitll_NOTT"
+	# OR2       = "LSmitll_OR2T"
+	# # SFQDCT  = "LSmitll_SFQDC1"
+	# XOR2a     = "LSmitll_XORT"
+	# SPLITT    = "LSmitll_SPLITT"
+	# SPLITCLK0 = "LSmitll_SPLITT"
+	# SPLITCLK1 = "LSmitll_SPLITT"
+	# SPLITCLK2 = "LSmitll_SPLITT"
+	# SPLITCLK3 = "LSmitll_SPLITT"
+	# SPLITCLK4 = "LSmitll_SPLITT"
+	# SPLITCLK5 = "LSmitll_SPLITT"
+	# SPLITCLK6 = "LSmitll_SPLITT"
+	# SPLITCLK7 = "LSmitll_SPLITT"
+	# SPLITTER  = "LSmitll_SPLITT"
+	# IN_A      = "a"
+	# IN_B      = "b"
+	# OUT_OUT   = "q"
+	# IN_CLK    = "clk"
+	# IN_SET    = "a"
+	# OUT_CLK1  = "q"
+	# OUT_CLK2  = "r"
+	# OUT_OUT1  = "q"
+	# OUT_OUT2  = "r"
+	# IN_IN     = "a"
+
+	# # Older
+	# PAD       = "PAD"
+	# P1        = "P1"
 
 
 # # The arrays shows the names of the pins of the macros(cells) for in the LEF/DEF file.

@@ -376,13 +376,17 @@ int def_file::to_jpg(const std::string &fileName){
   vector<string> fromSTR;
   vector<string> toSTR;
 
-  const string clkStr = "SplitCLK";
+  const vector<string> clkKeys = {"SplitCLK", "SC", "clk", "CLK", "Clk"};
+  // const string clkStr = "SplitCLK";
+  // const string clkStr = "SC";
   const string inStr = "IN";
   const string outStr = "OUT";
 
   for(auto &fooNet: this->nets){
-  	if((fooNet.get_varFromComp().find(clkStr) == string::npos)
-  			&& fooNet.get_varToComp().find(clkStr) == string::npos){
+    if(!fuzzySearch(fooNet.get_varFromComp(), clkKeys) 
+      && !fuzzySearch(fooNet.get_varToComp(), clkKeys)){
+  	// if((fooNet.get_varFromComp().find(clkStr) == string::npos)
+  	// 		&& fooNet.get_varToComp().find(clkStr) == string::npos){
   		if(fooNet.get_varFromPin().find(inStr) == string::npos){
   			if(fooNet.get_varToPin().find(outStr) == string::npos){
 	  			fromSTR.push_back(fooNet.get_varFromComp());
@@ -689,4 +693,20 @@ void def_net::to_str(){
 
 	}
 	return 1;
+}
+/**
+ * [fuzzySearch - searching a string with a set(vector) of keys]
+ * @param  word [The string in which much be searched]
+ * @param  keys [vector of key words to search for]
+ * @return      [true if found else false]
+ */
+bool fuzzySearch(string word, vector<string> keys){
+
+  for(const auto &key: keys){
+    if(word.find(key) != string::npos){
+      return true;
+    }
+  }
+
+  return false;
 }

@@ -29,6 +29,7 @@ using namespace std;
 #define c_ms 299792458
 
 vector<string> splitFileLine(ifstream &inFile);
+bool fuzzySearch(string word, vector<string> keys);
 
 class def_file{
 	private:

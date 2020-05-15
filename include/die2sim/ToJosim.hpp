@@ -19,6 +19,7 @@
 #include <fstream>
 #include <math.h>
 #include <unordered_map>
+#include <vector>
 // #include <map>
 //
 #include "die2sim/ParserJosim.hpp"
@@ -41,8 +42,13 @@ class def2josim{
     unordered_map<string, int> NetListPinNo;
 
     // config parameters
+    string para_dangling_net = "????";
+    bool para_PTL_length_bool = false;
     float para_PTL_length = -1;
     bool para_mergeIntoSubcir = true;
+    vector<string> input_keys;
+    vector<string> output_keys;
+    vector<string> clock_keys;
 
     // DEF file data
     vector<def_component> defComps;
