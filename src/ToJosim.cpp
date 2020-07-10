@@ -42,17 +42,26 @@ int def2josim::fetchData(string ConfigFileName, string DefFileName){
 
 	const auto mainConfig      = toml::parse(ConfigFileName);
 	this->NetListLoc           = toml::get<unordered_map<string, string>>(mainConfig.at("NETLIST_LOCATIONS"));
-	this->USC2LSmitllMap       = toml::get<unordered_map<string, string>>(mainConfig.at("USC2LSmitll"));
-	this->NetListPins          = toml::get<unordered_map<string, vector<string>>>(mainConfig.at("LSmitll_netlist"));
+	this->USC2LSmitllMap       = toml::get<unordered_map<string, string>>(mainConfig.at("TRANSLATION_TABLE"));
+	this->NetListPins          = toml::get<unordered_map<string, vector<string>>>(mainConfig.at("GATE_NETLIST"));
 
-	const auto& tomlparameters = toml::find(mainConfig, "Parameters");
+	const auto& tomlparameters = toml::find(mainConfig, "PARAMETERS");
 	para_dangling_net          = toml::find<string>(tomlparameters, "dangling_net_name");
 	para_PTL_length_bool       = toml::find<bool>(tomlparameters, "force_PTL_Length");
 	para_PTL_length            = toml::find<float>(tomlparameters, "force_PTL_length_value");
-	para_mergeIntoSubcir       = toml::find<bool>(tomlparameters, "merge_into_subcircuit");
+	// para_mergeIntoSubcir       = toml::find<bool>(tomlparameters, "merge_into_subcircuit");
 	input_keys                 = toml::find<vector<string>>(tomlparameters, "input_name_keys");
 	output_keys                = toml::find<vector<string>>(tomlparameters, "output_names_keys");
 	clock_keys                 = toml::find<vector<string>>(tomlparameters, "clock_names_keys");
+
+	time_step                  = toml::find<float>(tomlparameters, "time_step");
+	time_duration              = toml::find<float>(tomlparameters, "time_duration");
+
+
+	const auto& tomlInputpattern = toml::find(mainConfig, "INPUT_PATTERN");
+	clock_freq                   = toml::find<float>(tomlInputpattern, "clock_freq");
+	input_peak                   = toml::find<int>(tomlInputpattern, "input_peak");
+	input_peak_time              = toml::find<int>(tomlInputpattern, "input_peak_time");
 
   // Creates a map with the number of pins of each sub-circuit
 	unordered_map<string, vector<string>>::iterator it;
@@ -91,8 +100,10 @@ int def2josim::genCir(string fileName){
 	}
 
 	joFile.createSubckt("Created_subckt");
-	joFile.setMergeIntoSubcir(para_mergeIntoSubcir);
+	// joFile.setMergeIntoSubcir(para_mergeIntoSubcir);
 	joFile.setNameKeys(input_keys, output_keys, clock_keys);
+	joFile.setTimePara(time_step, time_duration);
+	joFile.setInputPat(clock_freq, input_peak, input_peak_time);
 
 	this->stitchCompNets();
 

@@ -9,6 +9,5 @@ cmake .. && \
 make && \
 cd ../
 ./build/Die2Sim -c ./config.toml
-# ./build/Die2Sim -j ./data/USC_new/KSA4_route.def
 
 echo "------------------ Script ended -------------------"

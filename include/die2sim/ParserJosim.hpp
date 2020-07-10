@@ -16,6 +16,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <algorithm> // for sorting
 #include <fstream>
 #include <stdio.h>
 #include <iomanip> // for string float precision
@@ -32,6 +33,18 @@ class CompClass;
 
 constexpr auto c_ms = 299792458;
 
+struct circuitInterface{
+	string netName   = "";	// Internal name of the net
+	string netDes    = "";	// Human readable name
+	string direction = "";  // OUT/IN
+	string ptlSide   = "";  // A/B
+	void create(string name, string description, string direction){
+		netName   = name;
+		netDes    = description;
+		direction = direction;
+	};
+};
+
 class JoSimFile{
 	private:
 		vector<string> fileNamesImport;
@@ -43,10 +56,18 @@ class JoSimFile{
 		vector<string> outputNameKeys;
 		vector<string> clockNameKeys;
 		vector<string> padNameKeys = {"PAD", "Pad", "pad"};
+		float timeStep = 0.1;
+		float timeDura = 1000;
+
+
+		float clkFreq     = 20;   // [GHz]
+		int inputPatPeak  = 600;	// [uA]
+		int inputPatPeakT = 35;   // [ps]
 
 		string subcktName;
-		vector<string> subcktNetName;	// Net name of the pad
-		vector<string> subcktNetDes;	// Name of the pad
+		vector<circuitInterface> subcktInt;
+		// vector<string> subcktNetName;	// Net name of the pad
+		// vector<string> subcktNetDes;	// Name of the pad
 
 		vector<PTLclass> PTLs;
 		vector<CompClass> comps;
@@ -72,6 +93,16 @@ class JoSimFile{
 			outputNameKeys = output;
 			clockNameKeys = clock;
 		};
+		void setTimePara(float step, float duration){
+			timeStep = step;
+			timeDura = duration;
+		}
+
+		void setInputPat(float freq, int peak, int peakT){
+			clkFreq       = freq;
+			inputPatPeak  = peak;
+			inputPatPeakT = peakT;
+		}
 
 		bool fuzzySearch(string word, vector<string> keys); // can be made independent
 

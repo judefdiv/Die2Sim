@@ -81,14 +81,6 @@ int RunTool(int argCount, char** argValues){
 		return 0;
 	}
 
-	// // search for .lef
-	// for(int i = 0; i < argCount; i++){
-	// 	foo = string(argValues[i]);
-	//   if(foo.find(".lef")!=string::npos){
-	//   	lefFName = foo;
-	//   }
-	// }
-
 	// search for .def
 	for(int i = 0; i < argCount; i++){
 		foo = string(argValues[i]);
@@ -184,7 +176,7 @@ int runFromFile(const string &fileName){
 	cout << "Importing execution parameters from config.toml" << endl;
 
 	const auto mainConfig  = toml::parse(fileName);
-	map<string, string> run_para = toml::get<map<string, string>>(mainConfig.at("File_Locations"));
+	map<string, string> run_para = toml::get<map<string, string>>(mainConfig.at("FILE_LOCATIONS"));
 
 	map<string, string>::iterator it_run_para;
 
@@ -218,12 +210,6 @@ int runFromFile(const string &fileName){
 
 	if(!command.compare("toJoSIM")){
 		if(outFName.compare("\0") && defFName.compare("\0")){
-
-			// def_file defFileIn;
-			// defFileIn.importFile(defFName);
-			// defFileIn.to_jpg(outFName);
-
-
 			return executeDef2Josim(fileName, defFName, outFName);
 		}
 		else{
@@ -244,9 +230,10 @@ void helpScreen(){
 	cout << "Usage: Die2Sim [ OPTION ] [ filenames ]" << endl;
 	cout << "-j(oSIM)      Converts LEF/DEF to .cir then simulates it through JoSIM." << endl;
 	cout << "                [.def file] -o [.cir file]" << endl;
-	cout << "-d(ot)        Converts LEF/DEF to a tree diagram." << endl;
-	cout << "                [.def file] -o [.jpg file]" << endl;
+	// cout << "-d(ot)        Converts LEF/DEF to a tree diagram." << endl;
+	// cout << "                [.def file] -o [.jpg file]" << endl;
 	cout << "-c(onfig)     Runs the tools using the parameters in the config.toml file." << endl;
+	cout << "                [.toml file]" << endl;
 	cout << "-v(ersion)    Displays the version number." << endl;
 	cout << "-h(elp)       Help screen." << endl;
 	cout << "===============================================================================" << endl;

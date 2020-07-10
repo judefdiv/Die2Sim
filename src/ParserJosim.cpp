@@ -69,11 +69,6 @@ int JoSimFile::genCir(string fileName){
 
   cirFile << makeHeader("Components") << endl;
   for(auto &it: this->comps){
-    // if(!it.getCompType().compare("pad")
-    //   || !it.getCompType().compare("PAD")
-    //   || !it.getCompType().compare("Pad")){
-    //   continue;
-    // }
     if(fuzzySearch(it.getCompType(), padNameKeys)){
       continue;
     }
@@ -94,18 +89,18 @@ int JoSimFile::genCir(string fileName){
     bool foundPad;
     for(auto &it: this->PTLs){
       foundPad = false;
-      for(unsigned int i = 0; i < this->subcktNetName.size(); i++){
-      // for(auto &itSubCirNet: this->subcktNetName){
-        if(!this->subcktNetName[i].compare(it.getNameNet()+"A")){
-          cirFile << it.to_cir_replace_a_net(subcktNetDes[i]) << endl;
+
+      for(const auto &itSub: subcktInt){
+       if(!itSub.netName.compare(it.getNameNet()+"A")){
+          cirFile << it.to_cir_replace_a_net(itSub.netDes) << endl;
           foundPad = true;
           break;
-        }
+        } 
       }
-
       if(!foundPad){
         cirFile << it.to_cir() << endl;
       }
+
     }
   }
   else{
@@ -146,8 +141,14 @@ string JoSimFile::genInstance(){
 
   if(mergeIntoSubcir){
     ss << "Xcircuit " << subcktName;
-    for(const auto &padNames: this->subcktNetDes){
-      ss << " " << padNames;
+    for(const auto &it: this->subcktInt){
+    // for(const auto &padNames: this->subcktNetDes){
+      
+      if(fuzzySearch(it.netDes, this->outputNameKeys)){
+        ss << " " << it.netDes << "_X";
+      } else{
+        ss << " " << it.netDes;  
+      }
     }
 
     ss << endl << endl;
@@ -160,36 +161,36 @@ string JoSimFile::genInstance(){
   ss << makeHeader("Inputs") << endl;
 
   unsigned int inputCnt = 1;
+  int clkPeriod = 1000/clkFreq; // [pico-seconds]
+  const string clkInput = "pulse(0 " + to_string(inputPatPeak) + "u 50p 10p 9p 1p " + to_string(clkPeriod) + "p)";
+  const string padInput = "pwl(0 0 " + to_string(inputPatPeakT-5) + "p 0 " + to_string(inputPatPeakT) + "p " + to_string(inputPatPeak) + "u " + to_string(inputPatPeakT+5) + "p 0)";
 
-  for(const auto &itPad: this->subcktNetDes){
 
-    if(fuzzySearch(itPad, outputNameKeys) == true){
+  for(const auto &it: this->subcktInt){
+  // for(const auto &itPad: this->subcktNetDes){
+
+    if(fuzzySearch(it.netDes, outputNameKeys) == true){
       continue;
     }
 
     // current source
-    if(fuzzySearch(itPad, clockNameKeys)){
-      ss  << setw(16) << "I" + itPad << " 0 " << inputCnt << "000" << " pulse(0 600u 50p 10p 9p 1p 51p)" << endl;
+    if(fuzzySearch(it.netDes, clockNameKeys)){
+      ss  << setw(16) << "I" + it.netDes << " 0 " << inputCnt << "000 " << clkInput << endl;
     }
     else{
-      ss << setw(16) << "I" + itPad << " 0 " << inputCnt << "000" << " pwl(0 0 30p 0 35p 600u 40p 0)" << endl;
+      ss << setw(16) << "I" + it.netDes << " 0 " << inputCnt << "000 " << padInput << endl;
     }
 
     // DCSFQ
-    ss << setw(16) << "XDCSFQ" + itPad << setw(15) << " LSMITLL_DCSFQ " << inputCnt << "000 " << inputCnt << "001" << endl;
+    ss << setw(16) << "XDCSFQ" + it.netDes << setw(15) << " LSMITLL_DCSFQ " << inputCnt << "000 " << inputCnt << "001" << endl;
 
     // JTL
-    ss << setw(16) << "XJTL" + itPad << setw(15) << " LSmitll_ptltx " << inputCnt << "001 " << itPad << endl;
+    ss << setw(16) << "XJTL" + it.netDes << setw(15) << " LSmitll_ptltx " << inputCnt << "001 " << it.netDes << endl;
 
     ss << endl;
 
     inputCnt++;
   }
-
-  // outStream << left;
-  // outStream << setw(20) << ("X" + this->name);
-  // outStream << setw(20) << compType;
-
 
   /**
    * Add resistors to the output pads
@@ -197,29 +198,13 @@ string JoSimFile::genInstance(){
   
   ss << makeHeader("Outputs") << endl;
 
-  // for(const auto &itPad: this->subcktNetDes){
-  //   if(fuzzySearch(itPad, outputNameKeys) == true){
-  //     // ss << "R" << itPad << " " << itPad << " 0 5" << endl;
-  //     ss << "X" << itPad << " LSmitll_ptlrx " << itPad << " " << itPad << endl;
-  //   }
-  // }
-
-
-  for(const auto &itPad: this->subcktNetDes){
-  static int i = 0;
-    if(fuzzySearch(itPad, outputNameKeys) == true){
-      // ss << "R" << itPad << " " << itPad << " 0 5" << endl;
-      ss << "X" << itPad << " LSmitll_ptlrx " << this->subcktNetName[i] << " " << itPad << endl;
+  for(const auto &it: this->subcktInt){
+    if(fuzzySearch(it.netDes, outputNameKeys) == true){
+      // ss << "X" << it.netDes << " LSmitll_ptlrx " << it.netName << " " << it.netDes << endl;
+      ss << "X" << it.netDes << " LSmitll_ptlrx " << it.netDes << "_X " << it.netDes << endl;
     }
-    i++;
   }
 
-  // for(unsigned int i = 0; i < this->subcktNetDes.size(); i++){
-  //   if(fuzzySearch(this->subcktNetDes[i], outputNameKeys) == true){
-  //     // ss << "R" << itPad << " " << itPad << " 0 5" << endl;
-  //     ss << "X" << this->subcktNetDes[i] << " LSmitll_ptlrx " << this->subcktNetName[i] << " " << this->subcktNetDes[i] << endl;
-  //   }
-  // }
 
   /**
    * Transient parameter
@@ -227,7 +212,7 @@ string JoSimFile::genInstance(){
 
   ss << makeHeader("Control") << endl;
 
-  ss << ".tran 0.25p 1000p 0 0.25p" << endl;
+  ss << ".tran " << this->timeStep << "p " << this->timeDura << "p" << endl;
 
   /**
    * Printing the data
@@ -235,8 +220,20 @@ string JoSimFile::genInstance(){
   
   ss << makeHeader("Prints") << endl;
 
-  for(const auto &itPad: this->subcktNetDes){
-    ss << ".print NODEV " << itPad << " 0" << endl;
+  // for(const auto it: this->subcktInt){
+  //   ss << ".print NODEV " << it.netDes << " 0" << endl;
+  // }
+
+  vector<string> lines;
+
+  for(const auto it: this->subcktInt){
+    lines.push_back(".print NODEV " + it.netDes + " 0");
+  }
+
+  sort(lines.begin(), lines.end());
+
+  for(const auto it: lines){
+    ss << it << endl;
   }
 
   ss << endl << ".end";
@@ -286,9 +283,19 @@ int JoSimFile::pushComp(string name, string compTypeName, vector<string> &netNam
   this->comps.push_back(fooComp);
 
   if(!compTypeName.compare("PAD")){
-    this->subcktNetName.push_back(netNames.back());
-    this->subcktNetDes.push_back(name);
+    circuitInterface foo;
+    // foo.create(netNames.back(), name, "OUT/IN");
+
+    if(fuzzySearch(name, this->outputNameKeys)){
+      foo.create(netNames.back(), name, "OUT");
+    }
+    else{
+      foo.create(netNames.back(), name, "IN");
+    }
+
+    this->subcktInt.push_back(foo);
   }
+
   return 0;
 }
 
@@ -316,15 +323,24 @@ int JoSimFile::pushPTL(const string &name, const string &netName, unsigned int l
 
 string JoSimFile::createSubcktHeader(){
 	string subcktStr = "* ";
-	for(unsigned int i = 0; i < this->subcktNetDes.size(); i++){
-	  subcktStr += "\t" + subcktNetDes[i];
-	}
+	// for(unsigned int i = 0; i < this->subcktNetDes.size(); i++){
+	//   subcktStr += "\t" + subcktNetDes[i];
+	// }
+
+  for(const auto it: this->subcktInt){
+  // for(unsigned int i = 0; i < this->subcktInt.size(); i++){
+    subcktStr += "\t" + it.netDes;
+  }
 
   subcktStr += "\n.SUBCKT " + this->subcktName;
 
-  for(unsigned int i = 0; i < this->subcktNetName.size(); i++){
-	  subcktStr += "\t" + subcktNetName[i];
-	}
+ //  for(unsigned int i = 0; i < this->subcktNetName.size(); i++){
+	//   subcktStr += "\t" + subcktNetName[i];
+	// }
+  for(const auto it: this->subcktInt){ 
+  // for(unsigned int i = 0; i < this->subcktInt.size(); i++){
+    subcktStr += "\t" + it.netName;
+  }
 
 	return subcktStr;
 }
@@ -411,13 +427,13 @@ string PTLclass::to_cir(){
   stringstream ss;
 
   ss << left;
-  ss << setw(10) << "T" + this->name;
-  ss << setw(10) << nameNet + "A";
-  ss << setw(4) << 0;
-  ss << setw(6) << nameNet + "B";
-  ss << setw(4) << 0;
   ss << setprecision(2);
-  ss << setw(0) << "  Z0=5.00  TD=" << this->length * speedConstant <<  "p";
+  ss << setw(10) << "T" + this->name;
+  ss << setw(10) << " " + nameNet + "A";
+  ss << setw(4)  << " 0";
+  ss << setw(10) << " " + nameNet + "B";
+  ss << setw(4)  << " 0";
+  ss << setw(0)  << "  Z0=5.00  TD=" << this->length * speedConstant <<  "p";
 
   return ss.str();
 }
@@ -426,12 +442,12 @@ string PTLclass::to_cir_replace_a_net(string netAName){
   stringstream ss;
 
   ss << left;
-  ss << setw(10) << ("T" + this->name);
-  ss << setw(10) << netAName;
-  ss << setw(4) << (0);
-  ss << setw(6) << (nameNet + "B");
-  ss << setw(4) << (0);
   ss << setprecision(2);
+  ss << setw(10) << ("T" + this->name);
+  ss << setw(10) << " " + netAName;
+  ss << setw(4)  << " 0";
+  ss << setw(10) << " " + nameNet + "B";
+  ss << setw(4)  << " 0";
   ss << setw(0) << "  Z0=5.00  TD=" << this->length * speedConstant <<  "p";
 
   return ss.str();

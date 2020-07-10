@@ -6,10 +6,9 @@ Due to the leniency of the syntax of the LEF/DEF file, Die2Sim was designed to u
 
 Version: 0.9
 
-## Features
-* Create JoSIM files.
+## Main Features
 * Convert DEF to JoSIM.
-* Create flow diagram of the circuit.
+* Create flow diagram of the circuit. (Experimental)
 
 ## Getting Started
 
@@ -18,8 +17,8 @@ Version: 0.9
 The following packages is required to successfully compile and execute Die2Sim.
 
 ``` bash
-apt install build-essencials    # for compiling
-apt install graphviz            # for creating hierarchy diagram(dot file)
+apt install build-essencials cmake  # for compiling
+apt install graphviz                # for creating hierarchy diagram(dot file)
 ```
 
 ### Installation
@@ -41,10 +40,10 @@ Examples of how to execute Die2Sim:
 ./Die2Sim -j defExample.def -o josimOutput.cir
 ```
 
-#### DEF to JPG
+#### Use CONFIG file
 
 ``` bash
-./Die2Sim -d defExample.def -o picOutput.jpg
+./Die2Sim -c config.toml
 ```
 
 
