@@ -78,7 +78,7 @@ int def2josim::fetchData(string ConfigFileName, string DefFileName){
 	def_file defFileIn;
 	defFileIn.importFile(DefFileName);
 
-	defFileIn.PTLstats();
+	// defFileIn.PTLstats();
 
 	this->defComps = defFileIn.getComps();
 	this->defNets = defFileIn.getNets();
@@ -106,6 +106,9 @@ int def2josim::genCir(string fileName){
 	joFile.setInputPat(clock_freq, input_peak, input_peak_time);
 
 	this->stitchCompNets();
+
+	joFile.printPTLstats();
+	joFile.exportTDelay("timeDelays.csv");
 
 	joFile.genCir(fileName);
 

@@ -32,6 +32,9 @@ class PTLclass;
 class CompClass;
 
 constexpr auto c_ms = 299792458;
+constexpr auto vg = 89.552; // Propagation delay [μm/ps]
+constexpr auto speedConstant = 1 / pow(10, 3) / vg;
+
 
 struct circuitInterface{
 	string netName   = "";	// Internal name of the net
@@ -106,6 +109,8 @@ class JoSimFile{
 
 		bool fuzzySearch(string word, vector<string> keys); // can be made independent
 
+		void printPTLstats();
+		void exportTDelay(const string &fileName);
 
 		void to_str();
 };
@@ -132,7 +137,8 @@ class PTLclass{
 		string nameNet;
 
 		int length;
-		const double speedConstant = 3 * pow(10, 3) / c_ms;
+		// const double speedConstant = 3 * pow(10, 3) / c_ms;  // USC
+		const double speedConstant = 1 / pow(10, 3) / vg;   //SANDIA; must convert DBunits to um
 
 	public:
 		PTLclass(){};
@@ -142,6 +148,8 @@ class PTLclass{
 		string to_cir();
 		string getNameNet(){return nameNet;};
 		string to_cir_replace_a_net(string netAName);
+		int getLength(){return this->length;};
+		double getTDelay(){return this->length * speedConstant;};
 };
 
 int cpFile(string fromFile, string toFile);

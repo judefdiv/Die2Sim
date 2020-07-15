@@ -366,6 +366,76 @@ void JoSimFile::to_str(){
 
 
 /**
+ * [JoSimFile::printPTLstats - Calculates basic statistics of the PTLs]
+ */
+void JoSimFile::printPTLstats(){
+
+  unsigned int lenMax = 0;       // Maximum length of the PTLs
+  unsigned int lenMin = 10000;   // Minimum length of the PTLs
+  float lenMean = 0;             // The mean/average length of the PTLs
+  unsigned int lenCnt = 0;       // Number of PTLs
+  unsigned long lenSum = 0;        // The sum of the PTL length
+  float stdVar = 0;              // Standards variance
+  const double speedConstant = 1 / pow(10, 3) / vg;
+
+  cout << "Calculating stats on the transmission lines." << endl;
+  lenCnt = this->PTLs.size();
+  for(auto itPTL: this->PTLs){
+    lenSum += itPTL.getLength();
+
+    if(itPTL.getLength() > lenMax)
+     lenMax = itPTL.getLength();
+
+    if(itPTL.getLength() < lenMin)
+     lenMin = itPTL.getLength();
+  }
+
+  lenMean = (float)lenSum / (float)lenCnt;
+
+  // for(unsigned int i = 0; i < lenCnt; i++){
+  for(auto itPTL: this->PTLs){
+    stdVar += pow((float)itPTL.getLength() - lenMean, 2);
+  }
+
+  stdVar /= lenCnt;
+
+  stdVar = sqrt(stdVar);
+
+  cout << "PTL Delay Statistics:" << endl;
+  cout << "\tCnt: "  << lenCnt << endl;
+  cout << "\tMin: "  << lenMin * speedConstant << "ps" << endl;
+  cout << "\tMean: "  << lenMean * speedConstant << "ps" << endl;
+  cout << "\tMax: "  << lenMax * speedConstant << "ps" << endl;
+  cout << "\tTotal: "  << lenSum /1000 << "nm" << endl;
+  cout << "\tstdVar: "  << stdVar << endl;
+
+}
+
+/**
+ * [JoSimFile::exportTDelay - Exports time delays of the PTLs to CSV file]
+ * @param fileName [description]
+ */
+void JoSimFile::exportTDelay(const string &fileName){
+  cout << "Exporting time delay of PTLs to :" << fileName << endl;
+  
+  ofstream outfile;
+  outfile.open(fileName);
+  
+  for(auto itPTL = this->PTLs.begin(); itPTL != this->PTLs.end(); itPTL++){
+    if(itPTL != this->PTLs.end()-1){
+      outfile << (*itPTL).getTDelay() << ",";
+    }
+    else{
+      outfile << (*itPTL).getTDelay();
+    }
+  }
+
+  outfile.close();
+
+  cout << "Done exporting." << endl;
+}
+
+/**
  * [CompClass::create - Creates the class]
  * @param  CompName     [The unique name of the component/subcircuit]
  * @param  compTypeName [The subcircuit or component type]
@@ -427,14 +497,24 @@ string PTLclass::to_cir(){
   stringstream ss;
 
   ss << left;
-  ss << setprecision(2);
   ss << setw(10) << "T" + this->name;
   ss << setw(10) << " " + nameNet + "A";
   ss << setw(4)  << " 0";
   ss << setw(10) << " " + nameNet + "B";
   ss << setw(4)  << " 0";
-  ss << setw(0)  << "  Z0=5.00  TD=" << this->length * speedConstant <<  "p";
 
+  double foo = this->length * speedConstant;
+
+  if(foo < 1.0){
+    ss << setprecision(1);
+    ss << setw(0)  << "  Z0=5.00  TD=" << foo <<  "p";
+  }
+  else{
+    ss << setprecision(2);
+    ss << setw(0)  << "  Z0=5.00  TD=" << foo <<  "p";
+  }
+
+  
   return ss.str();
 }
 
@@ -442,13 +522,22 @@ string PTLclass::to_cir_replace_a_net(string netAName){
   stringstream ss;
 
   ss << left;
-  ss << setprecision(2);
   ss << setw(10) << ("T" + this->name);
   ss << setw(10) << " " + netAName;
   ss << setw(4)  << " 0";
   ss << setw(10) << " " + nameNet + "B";
   ss << setw(4)  << " 0";
-  ss << setw(0) << "  Z0=5.00  TD=" << this->length * speedConstant <<  "p";
+ 
+  double foo = this->length * speedConstant;
+
+  if(foo < 1){
+    ss << setprecision(1);
+    ss << setw(0)  << "  Z0=5.00  TD=" << foo <<  "p";
+  }
+  else{
+    ss << setprecision(2);
+    ss << setw(0)  << "  Z0=5.00  TD=" << foo <<  "p";
+  }
 
   return ss.str();
 }
