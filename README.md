@@ -43,6 +43,9 @@ Examples of how to execute Die2Sim:
 ./Die2Sim -h
 ```
 
+## Configuration
+In ``` config.toml ``` are the current available parameters to control the *JoSIM* simulation.
+
 ## Notes
 
 For IARPA contract SuperTools
