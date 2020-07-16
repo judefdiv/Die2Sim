@@ -8,6 +8,6 @@ cd build
 cmake .. && \
 make && \
 cd ../
-./build/Die2Sim -c ./config.toml
+./build/Die2Sim -h
 
 echo "------------------ Script ended -------------------"

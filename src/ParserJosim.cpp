@@ -371,11 +371,11 @@ void JoSimFile::to_str(){
 void JoSimFile::printPTLstats(){
 
   unsigned int lenMax = 0;       // Maximum length of the PTLs
-  unsigned int lenMin = 10000;   // Minimum length of the PTLs
+  unsigned int lenMin = 1000000; // Minimum length of the PTLs
   float lenMean = 0;             // The mean/average length of the PTLs
   unsigned int lenCnt = 0;       // Number of PTLs
   unsigned long lenSum = 0;        // The sum of the PTL length
-  float stdVar = 0;              // Standards variance
+  // float stdVar = 0;              // Standards variance
   const double speedConstant = 1 / pow(10, 3) / vg;
 
   cout << "Calculating stats on the transmission lines." << endl;
@@ -392,14 +392,13 @@ void JoSimFile::printPTLstats(){
 
   lenMean = (float)lenSum / (float)lenCnt;
 
-  // for(unsigned int i = 0; i < lenCnt; i++){
-  for(auto itPTL: this->PTLs){
-    stdVar += pow((float)itPTL.getLength() - lenMean, 2);
-  }
+  // for(auto itPTL: this->PTLs){
+  //   stdVar += pow((float)itPTL.getLength() - lenMean, 2);
+  // }
 
-  stdVar /= lenCnt;
+  // stdVar /= lenCnt;
 
-  stdVar = sqrt(stdVar);
+  // stdVar = sqrt(stdVar);
 
   cout << "PTL Delay Statistics:" << endl;
   cout << "\tCnt: "  << lenCnt << endl;
@@ -407,7 +406,7 @@ void JoSimFile::printPTLstats(){
   cout << "\tMean: "  << lenMean * speedConstant << "ps" << endl;
   cout << "\tMax: "  << lenMax * speedConstant << "ps" << endl;
   cout << "\tTotal: "  << lenSum /1000 << "nm" << endl;
-  cout << "\tstdVar: "  << stdVar << endl;
+  // cout << "\tstdVar: "  << stdVar << endl;
 
 }
 

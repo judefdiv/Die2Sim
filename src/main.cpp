@@ -18,7 +18,7 @@
 #include "toml/toml.hpp"
 #include "die2sim/ToJosim.hpp"
 
-#define versionNo 0.9
+#define versionNo 1.0
 #define parameterFile "config.toml"
 
 using namespace std;
@@ -232,8 +232,8 @@ void helpScreen(){
 	cout << "                [.def file] -o [.cir file]" << endl;
 	// cout << "-d(ot)        Converts LEF/DEF to a tree diagram." << endl;
 	// cout << "                [.def file] -o [.jpg file]" << endl;
-	cout << "-c(onfig)     Runs the tools using the parameters in the config.toml file." << endl;
-	cout << "                [.toml file]" << endl;
+	// cout << "-c(onfig)     Runs the tools using the parameters in the config.toml file." << endl;
+	// cout << "                [.toml file]" << endl;
 	cout << "-v(ersion)    Displays the version number." << endl;
 	cout << "-h(elp)       Help screen." << endl;
 	cout << "===============================================================================" << endl;
@@ -245,8 +245,8 @@ void helpScreen(){
 
 void welcomeScreen(){
 	cout << "=====================================" << endl;
-	cout << "              Die2Sim" << endl;
-	cout << "       Author JF de Villiers" << endl;
+	cout << "         Die2Sim (Version: " << versionNo << ")" << endl;
+	cout << "       Author: JF de Villiers" << endl;
 	cout << "      Stellenbosch University" << endl;
 	cout << "    For IARPA, ColdFlux project" << endl;
 	cout << "=====================================" << endl;

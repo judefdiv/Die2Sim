@@ -37,6 +37,12 @@ Examples of how to execute Die2Sim:
 ./Die2Sim -j defExample.def -o josimOutput.cir
 ```
 
+#### Help
+
+``` bash
+./Die2Sim -h
+```
+
 ## Notes
 
 For IARPA contract SuperTools
