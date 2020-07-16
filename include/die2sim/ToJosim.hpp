@@ -4,7 +4,7 @@
  * For:					Supertools, Coldflux Project - IARPA
  * Created: 		2019--04-25
  * Modified:
- * license: 
+ * license:
  * Description: Runs the LEF/DEF files through JoSIM.
  * File:				ToJosim.hpp
  */
@@ -12,34 +12,70 @@
 #ifndef joSim
 #define joSim
 
-#define configFile "config.toml"
+// #define configFile "config.toml"
 
 #include "toml/toml.hpp"
 #include <iostream>
 #include <fstream>
 #include <math.h>
-// #include <unordered_map> 
-#include <map>
+#include <unordered_map>
+#include <vector>
+// #include <map>
+//
 #include "die2sim/ParserJosim.hpp"
-
-#include "die2sim/ClassDef.hpp"
 #include "die2sim/ParserDef.hpp"
-// #include "lefClass.h"
-// #include "lefPasser.h"
-
 #include "die2sim/genFunc.hpp"
+
 using namespace std;
 
-int runJoSIM(string lefFileName, string defFileName, string cirFileName);
 
-int stitchNets(string defFileName);
+int executeDef2Josim(string ConfigFileName, string DefFileName, string cirFileName);
 
-// int subcktPinLoc(string compName, string pinName);
-int subcktPinNo(string cellName);
-int subcktPinLoc(string cellName, string pinName);
-string USC2LSmitll(string LSmitllStr);
-string USC2LSmitllPin(string compName, string pinName);
+class def2josim{
+  private:
+    JoSimFile joFile;
 
-int ptlStats(string defFileName);
+    // config file parameters and USC translation tables
+    unordered_map<string, string> USC2LSmitllMap;
+    unordered_map<string, string> NetListLoc;
+    unordered_map<string, vector<string>> NetListPins;
+    unordered_map<string, int> NetListPinNo;
+
+    // config parameters
+    string para_dangling_net  = "????";
+    bool para_PTL_length_bool = false;
+    float para_PTL_length     = -1;
+    bool para_mergeIntoSubcir = true;
+    vector<string> input_keys;
+    vector<string> output_keys;
+    vector<string> clock_keys;
+    float time_step           = 0.1;
+    float time_duration       = 1000;
+
+    // Input pattern parameters
+    float clock_freq    = 1.0;
+    int input_peak      = 600;
+    int input_peak_time = 35;
+
+    // DEF file data
+    vector<def_component> defComps;
+    vector<def_net> defNets;
+
+    // functions:
+    int stitchCompNets();
+
+    int subcktNoPins(string cellName);
+    int subcktPinLoc(string cellName, string pinName);
+    string USC2LSmitll(string USCstr);
+    string USC2LSmitllPin(string compName, string pinName);
+
+  public:
+    def2josim(){};
+    ~def2josim(){};
+
+    int fetchData(string ConfigFileName, string DefFileName);
+    int genCir(string fileName);
+    int ptlStats();               // is this the right place for it?
+};
 
 #endif

@@ -3,8 +3,14 @@
 *.out
 
 # Private data
-data/
+data/cell_lib/archive/
+data/ownData/
 docs/
 
 # Unnecessary
 build/
+Die2SimScript
+/die2simRelease.sublime-project
+/die2simRelease.sublime-workspace
+/die2sim.sublime-project
+/die2sim.sublime-workspace

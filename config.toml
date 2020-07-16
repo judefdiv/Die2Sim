@@ -3,214 +3,162 @@
 # For:					Supertools, Coldflux Project - IARPA
 # Created: 		2019-05-09
 # Modified:
-# license: 
+# license:
 # Description: Configuration file for defining stuffs
 # File:				 config.toml
 
-# version = 0.3
+[FILE_LOCATIONS]
+	# defFileName = "./data/USC_new/arrmult4_route.def"
+	# cirFileName = "./data/USC_new/arrmult4.cir"	# output file name
 
-# Optional run parameters which can be utilised instead of CLI parameters
-[run_parameters]
-	# current possible commands: gds; josim; decipherer
-	Command     = "gds"
-	# Command     = "josim"
+	# defFileName = "./arrmult4_route.def"
+	# cirFileName = "./arrmult4_route.cir"
 
-	# Decipherer
-	# deciFileName = ""
+	# defFileName = "./KSA4_v1p5_vert_route.def"
+	# cirFileName = "./KSA4_v1p5_vert_fixedPTL.cir"
 
-	# Output file
-	# outFileName = "data/results/JoSIM_HASH_KSA4_route_opt.cir"
+[PARAMETERS]
+	time_step              = 0.1 						# Time step in picoseconds(ps)
+	time_duration          = 2500.0					# Time step in picoseconds(ps)
+	dangling_net_name			 = "0"
+	force_PTL_Length       = false
+	force_PTL_length_value = 100000.0 			# sets a fixed track length
+	input_name_keys        = ["IN", "In", "in", "a", "b", "CLK", "Clk", "clk"]
+	output_names_keys      = ["SUM", "Sum", "sum", "OUT", "Out", "out", "q", "m"] # Primarily used
+	clock_names_keys       = ["CLK", "Clk", "clk", "CLOCK", "Clock", "clock"]
 
-	# ----------------------------------------------------------------------------
-	# --------------------------------- SUN --------------------------------------
-	# ----------------------------------------------------------------------------
+[INPUT_PATTERN]	 # Input pattern/parameters
+	clock_freq      = 20.0   # [GHz] [float]
+	input_peak      = 600   # [uA]	[integer]
+	input_peak_time = 1000    # [ps]  [integer]
 
-	lefFileName = "data/lefdef/SUN/lef_2_metals.lef"
-	
-	# Kogge-Stone adders
-	defFileName = "data/lefdef/SUN/KSA4_route.def"
-	# defFileName = "data/lefdef/SUN/KSA8_route.def"
-	# defFileName = "data/lefdef/SUN/KSA16_route.def"
-	# defFileName = "data/lefdef/SUN/KSA32_route.def"
+[NETLIST_LOCATIONS]
+	LSmitll_AND2T       = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_AND2T_v1p5.cir"
+	LSmitll_bufft       = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_bufft_v1p5.cir"
+	LSmitll_buff        = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_buff_v1p5.cir"
+	LSMITLL_CLKSPLTT    = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_CLKSPLTT_v1p5.cir"
+	LSMITLL_CLKSPLT     = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_CLKSPLT_v1p5.cir"
+	LSmitll_DCSFQ_PTLTX = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_DCSFQ_PTLTX_v1p5.cir"
+	LSmitll_DCSFQ       = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_DCSFQ_v1p5.cir"
+	LSmitll_DFFT        = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_DFFT_v1p5.cir"
+	LSmitll_JTLT        = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_JTLT_v1p5.cir"
+	LSmitll_MERGET      = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_MERGET_v1p5.cir"
+	LSmitll_NDROT       = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_NDROT_v1p5.cir"
+	LSmitll_NOTT        = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_NOTT_v1p5.cir"
+	LSmitll_OR2T        = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_OR2T_v1p5.cir"
+	LSmitll_PTLRX_SFQDC = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_PTLRX_SFQDC_v1p5.cir"
+	LSmitll_PLTRX       = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_ptlrx_v1p5.cir"
+	LSmitll_PLTTX       = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_ptltx_v1p5.cir"
+	LSmitll_SFQDC       = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_SFQDC_v1p5.cir"
+	LSmitll_SPLITT      = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_SPLITT_v1p5.cir"
+	LSmitll_XORT        = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_XORT_v1p5.cir"
 
-	# Array multipliers
-	# defFileName = "data/lefdef/SUN/arrmult4_route.def"
-	# defFileName = "data/lefdef/SUN/arrmult8_route.def"
-
-	# Integer divider
-	# defFileName = "data/lefdef/SUN/ID4s_route.def"
-
-	# ISCAS85 (benchmark circuit)
-	# defFileName = "data/lefdef/SUN/c432_route.def"
-	# defFileName = "data/lefdef/SUN/c499_route.def"
-	# defFileName = "data/lefdef/SUN/c880_route.def"
-	# defFileName = "data/lefdef/SUN/c1355_route.def"
-	# defFileName = "data/lefdef/SUN/c1908_route.def"
-
-	# ----------------------------------------------------------------------------
-	# --------------------------------- USC --------------------------------------
-	# ----------------------------------------------------------------------------
-
-	# lefFileName = "data/lefdef/USC/lef_2_metals.lef"
-
-	# Kogge-Stone adders
-	# defFileName = "data/lefdef/USC/KSA4_route_opt.def"
-	# defFileName = "data/lefdef/USC/KSA8_route_opt.def"
-	# defFileName = "data/lefdef/USC/KSA16_route_opt.def"
-	# defFileName = "data/lefdef/USC/KSA32_route_opt.def"
-
-	# Array multipliers
-	# defFileName = "data/lefdef/USC/arrmult4_route_opt.def"
-	# defFileName = "data/lefdef/USC/arrmult8_route_opt.def"
-	# defFileName = "data/lefdef/USC/arrmult16_placed_route_opt.def"
-
-	# Integer divider
-	# defFileName = "data/lefdef/USC/ID4s_route_opt.def"
-	# defFileName = "data/lefdef/USC/ID8s_route_opt.def"
-	# defFileName = "data/lefdef/USC/ID16s_route_opt.def"
-
+	# OLD
+	# LSmitll_AND2T   = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_AND2T.cir"
+	# LSmitll_DCSFQ   = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_DCSFQ.cir"
+	# LSmitll_DFFT    = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_DFFT.cir"
+	# LSmitll_MERGET  = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_MERGET.cir"
+	# LSmitll_NOTT    = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_NOTT.cir"
+	# LSmitll_OR2T    = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_OR2T.cir"
+	# LSmitll_SPLITT  = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_SPLITT.cir"
+	# LSmitll_XORT    = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_XORT.cir"
+	# LSmitll_JTLT    =	"data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_jtlt.cir"
+	# LSmitll_NDROT   =	"data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_NDROT.cir"
+	# LSmitll_PLTTX   =	"data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_PTLTX.cir"
+	# LSmitll_PLTRX   =	"data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_PTLRX.cir"
 
 # The arrays shows the pins of the cells for the SPICE sub-circuits.
 # The order of the pins/ports are important due to mapping
-[LSmitll_netlist]
-	LSMITLL_AND2T   = ["IN_CLK", "IN_1", "IN_2", "OUT"]
-	LSmitll_DCSFQ   = ["IN", "OUT"]
-	LSMITLL_DFFT    = ["IN", "IN_CLK", "OUT"]
-	LSMITLL_JTLT    = ["IN", "OUT"]
-	LSmitll_MERGET  = ["IN_1", "IN_2", "OUT"]
-	LSMITLL_NDROT   = ["IN_SET", "IN_RESET", "IN_CLK", "OUT"]
-	LSMITLL_NOTT    = ["IN", "IN_CLK", "OUT"]
-	LSMITLL_OR2T    = ["IN_CLK", "IN_1", "IN_2", "OUT"]
-	LSmitll_SFQDC1  = ["IN", "OUT"]
-	MITLL_SPLITT    = ["IN", "OUT_1", "OUT_2"]
-	LSMITLL_XORT    = ["IN_CLK", "IN_1", "IN_2", "OUT"]
-	PAD             = ["P1"]																		# does NOT EXIST, used for mapping in/out pins
+[GATE_NETLIST]
+	LSmitll_AND2T       = ["a", "b", "clk", "q"]
+	LSmitll_DCSFQ       = ["a", "q"]
+	LSmitll_DFFT        = ["a", "clk", "q"]
+	LSmitll_JTLT   	    = ["a", "q"]
+	LSmitll_MERGET      = ["a", "b", "q"]
+	LSmitll_NDROT       = ["a", "b", "clk", "q"] # a - IN_SET; b - IN_RESET
+	LSmitll_NOTT        = ["a", "clk", "q"]
+	LSmitll_OR2T        = ["a", "b", "clk", "q"]
+	LSmitll_SPLITT      = ["a", "q", "r"]
+	LSmitll_XORT        = ["a", "b", "clk", "q"]
+	PAD                 = ["P1"]								# does NOT EXIST, used for mapping in/out pins
+	LSmitll_bufft       = ["a", "q"]
+	LSmitll_buff        = ["a", "q"]
+	LSMITLL_CLKSPLTT    = ["a", "q", "r"]
+	LSMITLL_CLKSPLT     = ["a", "q", "r"]
+	LSmitll_DCSFQ_PTLTX = ["a", "q"]
+	LSmitll_PTLRX_SFQDC = ["a", "q"]
+	LSmitll_SFQDC       = ["a", "q"]
 
-# GDS file location of the cell library
-[LSmitll_GDS_File_Location]
-	NETLIST = "data/cell_lib/LSmitll/LSmitll_all.cir"
-	DFFT    = "data/cell_lib/LSmitll/LSmitll_DFFT.gds"
-	JTLT    = "data/cell_lib/LSmitll/LSmitll_jtlt.gds"
-	MERGET  = "data/cell_lib/LSmitll/LSmitll_MERGET.gds"
-	NOTT    = "data/cell_lib/LSmitll/LSmitll_NOTT.gds"
-	SPLITT  = "data/cell_lib/LSmitll/LSmitll_SPLITT.gds"
-	AND2T   = "data/cell_lib/LSmitll/LSmitll_AND2T.gds"
-	OR2T    = "data/cell_lib/LSmitll/LSmitll_OR2T.gds"
-	XOR2T   = "data/cell_lib/LSmitll/LSmitll_XORT.gds"
-	NDROT   = "data/cell_lib/LSmitll/LSmitll_NDROT.gds"
+[TRANSLATION_TABLE]
 
-# use only when LED/DEF was developed for a cell library
-[LSmitll_LEF2GDS_Ref_Name]
-	NOTT      = "LSmitll_NOTT"
-	DFFT      = "LSmitll_DFFT"
-	JTLT      = "LSmitll_jtlt"
-	SPLITT    = "LSmitll_SPLITT"
-	MERGET    = "LSmitll_MERGET"
-	AND2T     = "LSmitll_AND2T"
-	XOR2T     = "LSmitll_XORT"
-	OR2T      = "LSmitll_OR2T"
-	NDRO      = "LSmitll_NDROT"
-	# MUX21     = ""
-	# PAD       = ""
-	# SPLITCLK0 = ""
-	# SPLITCLK1 = ""
-	# SPLITCLK2 = ""
-	# SPLITCLK3 = ""
-	# SPLITCLK4 = ""
-	# SPLITCLK5 = ""
-	# SPLITCLK6 = "" 
-	# SPLITCLK7 = ""
-	# SPLITT = "SPLITT"
-	# DFFT   = "DFFT"
+	############################################# 
+	#################### SUN ####################
+	#############################################
 
-# Basic translator for USC to LSMITLL. Used in JoSIM
-[USC2LSmitll]
-	# AND2       = "LSMITLL_AND2T"
-	# DCSFQ      = "LSmitll_DCSFQ"
-	# DFF        = "LSMITLL_DFFT"
-	# JTL        = "LSMITLL_JTLT"
-	# Merge      = "LSmitll_MERGET"
-	# NDRO       = "LSMITLL_NDROT"
-	# NOT        = "LSMITLL_NOTT"
-	# OR2        = "LSMITLL_OR2T"
-	# SFQDC      = "LSmitll_SFQDC1"
-	# XOR2a      = "LSMITLL_XORT"
-	# SPLITTER   = "MITLL_SPLITT"
-	# SPLITCLK0  = "MITLL_SPLITT"
-	# SPLITCLK1  = "MITLL_SPLITT"
-	# SPLITCLK2  = "MITLL_SPLITT"
-	# SPLITCLK3  = "MITLL_SPLITT"
-	# SPLITCLK4  = "MITLL_SPLITT"
-	# SPLITCLK5  = "MITLL_SPLITT"
-	# SPLITCLK6  = "MITLL_SPLITT"
-	# SPLITCLK7  = "MITLL_SPLITT"
-	# PAD        = "PAD"
-	# P1         = "P1"
-	# IN_CLK     = "IN_CLK"
-	# IN_A       = "IN_1"
-	# IN_B       = "IN_2"
-	# IN_IN      = "IN"
-	# OUT_OUT    = "OUT"
-	# OUT_CLK    = "??"
-	# IN_CLK_S   = "IN"
-	# OUT_OUT1   = "OUT_1"
-	# OUT_OUT2   = "OUT_2"
-	# OUT_CLK1   = "OUT_1"
-	# OUT_CLK2   = "OUT_2"
-	# IN_SET     = "IN"
+	JTLT     = "LSmitll_JTLT"
+	MERGET   = "LSmitll_MERGET"
+	SPLIT    = "LSmitll_SPLITT"
+	DFF      = "LSmitll_DFFT"
+	NOTT     = "LSmitll_NOTT"
+	AND2T    = "LSmitll_AND2T"
+	OR2T     = "LSmitll_OR2T"
+	XOR2T    = "LSmitll_XORT"
+	PAD      = "PAD"
+	CLKBUFF  = "LSmitll_buff"
+	CLKSPLIT = "LSMITLL_CLKSPLTT"
+
+
+	# Pins
+	INOUT_1 = "P1" # just for pads
+	IN_1    = "a"
+	IN_2    = "b"
+	OUT_1   = "q"
+	OUT_2   = "r"
+	CLK     = "clk"
+
+	# DCSFQ       = "LSmitll_DCSFQ"
+	# NDROT       = "LSmitll_NDROT"
+	# bufft       = "LSmitll_bufft"
+	# buff        = "LSmitll_buff"
+	# CLKSPLTT    = "LSMITLL_CLKSPLTT"
+	# CLKSPLT     = "LSMITLL_CLKSPLT"
+	# DCSFQ_PTLTX = "LSmitll_DCSFQ_PTLTX"
+	# PTLRX_SFQDC = "LSmitll_PTLRX_SFQDC"
+	# SFQDC       = "LSmitll_SFQDC"
 	
-	AND2T     = "LSMITLL_AND2T"
-	# DCSFQT  = "LSmitll_DCSFQ"
-	DFFT      = "LSMITLL_DFFT"
-	JTLT      = "LSMITLL_JTLT"
-	Merge     = "LSmitll_MERGET"
-	# NDROT   = "LSMITLL_NDROT"
-	NOTT      = "LSMITLL_NOTT"
-	OR2T      = "LSMITLL_OR2T"
-	# SFQDCT  = "LSmitll_SFQDC1"
-	XOR2T     = "LSMITLL_XORT"
-	SPLITT    = "MITLL_SPLITT"
-	SPLITCLK0 = "MITLL_SPLITT"
-	SPLITCLK1 = "MITLL_SPLITT"
-	SPLITCLK2 = "MITLL_SPLITT"
-	SPLITCLK3 = "MITLL_SPLITT"
-	SPLITCLK4 = "MITLL_SPLITT"
-	SPLITCLK5 = "MITLL_SPLITT"
-	SPLITCLK6 = "MITLL_SPLITT"
-	SPLITCLK7 = "MITLL_SPLITT"
-	PAD       = "PAD"
-	P1        = "P1"
-	IN_CLK    = "IN_CLK"
-	CLK    = "IN_CLK"
-	IN1      = "IN_1"
-	IN2      = "IN_2"
-	IN     = "IN"
-	OUT   = "OUT"
-	OUT_CLK   = "??"
-	IN_CLK_S  = "IN"
-	OUT1  = "OUT_1"
-	OUT2  = "OUT_2"
-	OUT_CLK1  = "OUT_1"
-	OUT_CLK2  = "OUT_2"
-	IN_SET    = "IN"
+	############################################# 
+	#################### USC ####################
+	#############################################
 
-# The arrays shows the names of the pins of the macros(cells) for in the LEF/DEF file.
-[USC_LEF]
-	PAD       = ["P1"]
-	AND2      = ["IN_A", "IN_B", "OUT_OUT", "IN_CLK", "OUT_CLK"]
-	XOR2a     = ["IN_A", "IN_B", "OUT_OUT", "IN_CLK", "OUT_CLK"]
-	OR2       = ["IN_A", "IN_B", "OUT_OUT", "IN_CLK", "OUT_CLK"]
-	NOT       = ["IN_A", "OUT_OUT", "IN_CLK", "OUT_CLK"]
-	DFF       = ["IN_SET", "OUT_OUT", "IN_CLK", "OUT_CLK"]
-	MUX21     = ["IN_A", "IN_SEL", "IN_B", "OUT_OUT", "IN_CLK", "OUT_CLK"]
-	NDRO      = ["IN_SET", "OUT_OUT", "IN_CLK", "OUT_CLK"]
-	SPLITTER  = ["IN_IN", "OUT_OUT1", "OUT_OUT2", "IN_CLK", "OUT_CLK"]
-	Merge     = ["IN_A", "IN_B", "OUT_OUT", "IN_CLK", "OUT_CLK"]
-	SPLITCLK0 = ["IN_CLK", "OUT_CLK1", "OUT_CLK2"]
-	SPLITCLK1 = ["IN_CLK", "OUT_CLK1", "OUT_CLK2"]
-	SPLITCLK2 = ["IN_CLK", "OUT_CLK1", "OUT_CLK2"]
-	SPLITCLK3 = ["IN_CLK", "OUT_CLK1", "OUT_CLK2"]
-	SPLITCLK4 = ["IN_CLK", "OUT_CLK1", "OUT_CLK2"]
-	SPLITCLK5 = ["IN_CLK", "OUT_CLK1", "OUT_CLK2"]
-	SPLITCLK6 = ["IN_CLK", "OUT_CLK1", "OUT_CLK2"]
-	SPLITCLK7 = ["IN_CLK", "OUT_CLK1", "OUT_CLK2"]
+	# AND2      = "LSmitll_AND2T"
+	# # DCSFQT  = "LSmitll_DCSFQ"
+	# DFF       = "LSmitll_DFFT"
+	# JTLT      = "LSmitll_JTLT"
+	# Merge     = "LSmitll_MERGET"
+	# # NDROT   = "LSMITLL_NDROT"
+	# NOT       = "LSmitll_NOTT"
+	# OR2       = "LSmitll_OR2T"
+	# # SFQDCT  = "LSmitll_SFQDC1"
+	# XOR2a     = "LSmitll_XORT"
+	# SPLITT    = "LSmitll_SPLITT"
+	# SPLITCLK0 = "LSmitll_SPLITT"
+	# SPLITCLK1 = "LSmitll_SPLITT"
+	# SPLITCLK2 = "LSmitll_SPLITT"
+	# SPLITCLK3 = "LSmitll_SPLITT"
+	# SPLITCLK4 = "LSmitll_SPLITT"
+	# SPLITCLK5 = "LSmitll_SPLITT"
+	# SPLITCLK6 = "LSmitll_SPLITT"
+	# SPLITCLK7 = "LSmitll_SPLITT"
+	# SPLITTER  = "LSmitll_SPLITT"
+	# IN_A      = "a"
+	# IN_B      = "b"
+	# OUT_OUT   = "q"
+	# IN_CLK    = "clk"
+	# IN_SET    = "a"
+	# OUT_CLK1  = "q"
+	# OUT_CLK2  = "r"
+	# OUT_OUT1  = "q"
+	# OUT_OUT2  = "r"
+	# IN_IN     = "a"
+	# PAD       = "PAD"
+	# P1        = "P1"

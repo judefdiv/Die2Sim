@@ -1,50 +1,25 @@
 # Die2Sim
-Die2Sim is a tool used to aid simulations of large scale superconducting circuits. The main usage of the tool is to create GDSII and JoSIM files from LEF/DEF files using an existing cell library.
+Die2Sim is a tool used to aid simulations of large scale superconducting circuits. The main usage of Die2Sim is to create JoSIM files from a DEF file using an existing cell library.
 
-Version: 0.9
+Version: 1.0
 
-## Features
-* LEF/DEF interpretation
-* GDS to ASCII
-* Easily create GDS file
-* Importing GDS files
-* Draw GDS file
-* Create JoSIM files
-* Convert LEF/DEF to GDS
-* Convert LEF/DEF to JoSIM
+## Main Features
+* Convert DEF to JoSIM.
+* Create flow diagram of the circuit. (Experimental)
 
-## Examples
-Examples of how to execute Die2Sim:
+## Getting Started
 
-### Interpret Files
+### Prerequisites
+
+The following packages is required to successfully compile and execute Die2Sim.
+
 ``` bash
-./Die2Sim -i gdsExample.gdsii
-./Die2Sim -i lefExample.lef
-./Die2Sim -i defExample.def
-```
-### LEF/DEF to GDSII
-``` bash
-./Die2Sim -g lefExample.lef defExample.def -o gdsOutput.gds
-./Die2Sim -g lefExample.lef defExample.def # automatically assigns output filename
-```
-### LEF/DEF to JoSIM
-``` bash
-./Die2Sim -j lefExample.lef defExample.def -o josimOutput.cir
-./Die2Sim -j lefExample.lef defExample.def # automatically assigns output filename
-```
-### Run Using Parameters from the config file
-``` bash
-./Die2Sim -c
+apt install build-essencials cmake  # for compiling
+apt install graphviz                # for creating hierarchy diagram(dot file)
 ```
 
-## Needed stuffs
-``` bash
-apt install build-essencials 	# for compiling
-apt install libreadline-dev 	# for Berkeley ABC
-# apt install gv graphviz				# to visualise ABC's logic flow
-apt install dot 							# To replace ABC's logic flow visuals
-```
-## To Compile
+### Installation
+
 ``` bash
 # Current directory: Die2Sim root
 mkdir build && cd build
@@ -52,23 +27,25 @@ cmake ..
 make
 ```
 
-## ABC Modifications
-``` cpp
-// in "abc/src/opt/dau/dau.h" added:
-extern void		Abc_TtVerifySmallTruth(word * pTruth, int nVars);
-extern int 		shiftFunc(int ci);
+### Usage
+
+Examples of how to execute Die2Sim:
+
+#### DEF to JoSIM
+
+``` bash
+./Die2Sim -j defExample.def -o josimOutput.cir
 ```
 
+#### Help
+
+``` bash
+./Die2Sim -h
+```
+
+## Configuration
+In ``` config.toml ``` are the current available parameters to control the *JoSIM* simulation.
+
 ## Notes
-Author - JF de Villiers (Stellenbosch University)
+
 For IARPA contract SuperTools
-
-LEF: Library Exchange Format
-
-DEF: Design Exchange Format
-
-GDSII: Graphic Database System
-
-JoSIM: Superconductor Circuit Simulator
-
-BLIF: The Berkeley Logic Interchange Format

@@ -4,12 +4,37 @@
  * For:					Supertools, Coldflux Project - IARPA
  * Created: 		2019-03-20
  * Modified:
- * license: 
+ * license:
  * Description: Useful general functions.
  * File:				genFunc.cpp
  */
 
 #include "die2sim/genFunc.hpp"
+
+/**
+ * splitFileLine - Reads the next line in a text file and separates the string by whitespaces
+ * @param  inFile [The pointer to the text file]
+ * @return        [The cleaned vector string]
+ */
+
+vector<string> splitFileLine(ifstream &inFile){
+	string lineIn;
+	char frontChar;
+
+	static vector<string> errorVec = {"\0"};
+
+	while(getline(inFile, lineIn)){
+		frontChar = (char)lineIn.front();
+		if(frontChar == '\n' || frontChar == '#' || frontChar == '\0'){			// skips commented and empty lines
+			//just loop
+		}
+		else{
+			return SplitStrVec(lineIn);
+		}
+	}
+	cout << "Extracting data file file error!!!" << endl;
+	return errorVec;
+}
 
 bool isStrDig(string wannaDig){
 	int i = 0;
@@ -46,7 +71,7 @@ void stringSplitVec(vector<string> &inVec, string inStr){
 	// int k;
 
 	inVec.clear();
-	
+
 	inStr = cleanWhite(inStr);						// remove whitespaces
 
 	WSposOld = 0;
@@ -62,7 +87,38 @@ void stringSplitVec(vector<string> &inVec, string inStr){
 		if(WSpos >= StrLen) break;
 	}
 
-  inVec.push_back("\0");									
+  inVec.push_back("\0");
+}
+
+/**
+ * SplitStrVec - sperates the string by white spaces
+ * @param  inStr [The input string that needs to be separated by whitespaces]
+ */
+
+vector<string> SplitStrVec(string inStr){
+	size_t WSpos = 0;													//Whitespace position
+	size_t WSposOld = 0;
+	size_t StrLen = 0;
+	string tempDis;
+
+	vector<string> fooVec;
+
+	inStr = cleanWhite(inStr);								// remove whitespaces
+
+	WSposOld = 0;
+	StrLen = inStr.length();
+	int j = 0;
+	while(j < 64){														// extracts the data into a string array
+		WSpos = inStr.find(" ", WSposOld);
+		if(WSpos > StrLen) WSpos = StrLen;
+
+		fooVec.push_back(inStr.substr(WSposOld, WSpos - WSposOld));
+		WSposOld = WSpos + 1;
+
+		if(WSpos >= StrLen) break;
+	}
+
+	return fooVec;
 }
 
 /**
@@ -146,7 +202,7 @@ string cleanWhite(string inStr){
 		// cout << "found double whitespace" << endl;
 		tempStr.erase(wsPos, 1);
 		wsPos = tempStr.find("  ");
-	}	
+	}
 
 	//Removes trailing whitespaces
 	tempChar = (char)tempStr.back();
@@ -198,6 +254,21 @@ string fileRenamer(string inName, string preFix, string suffix){
 
 	inName.erase(0, inName.find_last_of("/")+1);
 	foo = inName.insert(0, preFix);
+
+	inName.erase(inName.find_last_of("."), inName.length());
+	foo = inName.insert(inName.length(), suffix);
+	return foo;
+}
+
+/**
+ * [fileRenamer - Cleans up file name and able to prepend or append a string]
+ * @param  inName [Input file name]
+ * @param  suffix [The string to be added to the end]
+ * @return        [The modified string]
+ */
+
+string fileExtensionRenamer(string inName, string suffix){
+	string foo;
 
 	inName.erase(inName.find_last_of("."), inName.length());
 	foo = inName.insert(inName.length(), suffix);
