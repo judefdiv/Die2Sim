@@ -33,7 +33,7 @@ class CompClass;
 
 constexpr auto c_ms = 299792458;
 constexpr auto vg = 89.552; // Propagation delay [μm/ps]
-constexpr auto speedConstant = 1 / pow(10, 3) / vg;
+constexpr auto speedConstant = 1 / 10e3 / vg;
 
 
 struct circuitInterface{
@@ -138,7 +138,7 @@ class PTLclass{
 
 		int length;
 		// const double speedConstant = 3 * pow(10, 3) / c_ms;  // USC
-		const double speedConstant = 1 / pow(10, 3) / vg;   //SANDIA; must convert DBunits to um
+		const double speedConstant = 1 / 10e3 / vg;   //SANDIA; must convert DBunits to um
 
 	public:
 		PTLclass(){};

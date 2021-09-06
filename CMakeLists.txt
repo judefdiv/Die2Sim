@@ -19,8 +19,10 @@ set(SOURCES
   src/main.cpp
   src/ParserDef.cpp
   src/ToJosim.cpp
+  src/ToVerilog.cpp
   src/ParserJosim.cpp
   src/genFunc.cpp
+  src/EmitterVerilog.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

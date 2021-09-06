@@ -17,6 +17,7 @@
 #include "die2sim/genFunc.hpp"
 #include "toml/toml.hpp"
 #include "die2sim/ToJosim.hpp"
+#include "die2sim/ToVerilog.hpp"
 
 #define versionNo 1.0
 #define parameterFile "config.toml"
@@ -57,7 +58,7 @@ int RunTool(int argCount, char** argValues){
 		return 0;
 	}
 
-	set<string> validCommands = {"-j", "-d", "-v", "-h", "-c"};
+	set<string> validCommands = {"-j", "-d", "-v", "-h", "-c", "-V"};
 
 	string outFName = "\0";			// The output file, which is follow by the -o parameter
 	string defFName = "\0";			// The DEF file
@@ -112,6 +113,11 @@ int RunTool(int argCount, char** argValues){
 			outFName = fileExtensionRenamer(defFName, ".cir");;
 		}
 	}
+	if(!outFName.compare("\0") && defFName.compare("\0")){
+		if(!command.compare("-V")){
+			outFName = fileExtensionRenamer(defFName, ".v");;
+		}
+	}
 
 	// --------------------------------------------------------------------
 	// ------------------------------ Commands ----------------------------
@@ -120,6 +126,16 @@ int RunTool(int argCount, char** argValues){
 	if(!command.compare("-j")){
 		if(defFName.compare("\0") && outFName.compare("\0")){
 			executeDef2Josim(parameterFile, defFName, outFName);
+			return 1;
+		}
+		else {
+			cout << "Input argument error." << endl;
+			return 0;
+		}
+	}
+	if(!command.compare("-V")){
+		if(defFName.compare("\0") && outFName.compare("\0")){
+			verilog::executeDef2Verilog(parameterFile, defFName, outFName);
 			return 1;
 		}
 		else {
