@@ -11,18 +11,19 @@ namespace verilogemit{
     enum PortType{
         IN,
         OUT,
-        CLK
+        CLK,
+        UNKNOWN
     };
 
      struct Port{
         string name;
         PortType portType;
-        int ptlId;
+        size_t ptlId;
     };
 
     struct Ptl{
-        int id;
-        float delay;
+        size_t id;
+        double delay;
     };
 
     struct Cell{

@@ -20,11 +20,12 @@
 [PARAMETERS]
 	time_step              = 0.1 						# Time step in picoseconds(ps)
 	time_duration          = 2500.0					# Time step in picoseconds(ps)
-	dangling_net_name			 = "0"
+	speedconstant		   = 95.1					# um / ps
+	dangling_net_name	   = "0"
 	force_PTL_Length       = false
 	force_PTL_length_value = 100000.0 			# sets a fixed track length
-	input_name_keys        = ["IN", "In", "in", "a", "b", "CLK", "Clk", "clk"]
-	output_names_keys      = ["SUM", "Sum", "sum", "OUT", "Out", "out", "q", "m"] # Primarily used
+	input_name_keys        = ["IN", "In", "in", "a", "b", "A", "B"]
+	output_names_keys      = ["SUM", "Sum", "sum", "OUT", "Out", "out", "q", "m", "r"] # Primarily used
 	clock_names_keys       = ["CLK", "Clk", "clk", "CLOCK", "Clock", "clock"]
 	topModuleName		   = "HalfAdder"
 	timescale			   = "1ps/100fs"

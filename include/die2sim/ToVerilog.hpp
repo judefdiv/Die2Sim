@@ -3,6 +3,7 @@
 #include<string>
 #include<vector>
 #include<unordered_map>
+#include<map>
 #include "die2sim/EmitterVerilog.hpp"
 
 namespace verilog{
@@ -38,6 +39,7 @@ namespace verilog{
 
         public:
             int fetchData(string ConfigFileName, string DefFileName);
+            verilogemit::PortType str2pt(string str);
             void genV();
             void dummyGenV();
     };

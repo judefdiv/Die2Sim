@@ -9,11 +9,11 @@ using namespace verilogemit;
 
 void def2verilog::dummyGenV(){
 	vf = verilogemit::VerilogFile("1ps/100fs", "HalfAdder");
-	for(int i=0; i<10; i++){
-		vf.addPtl({i, (float)(i*2)});
+	for(size_t i=0; i<10; i++){
+		vf.addPtl({i, (double)(i*2)});
 	}
-	int ptlid = 0;
-	for(int i=0; i<10; i++){
+	size_t ptlid = 0;
+	for(size_t i=0; i<10; i++){
 		vector<Port> ports;
 		if(i%2 == 0){
 			ports.push_back({"a", IN, ptlid++});
@@ -42,15 +42,59 @@ void def2verilog::dummyGenV(){
 	vf.emit("mymodule.v");
 }
 
+verilogemit::PortType def2verilog::str2pt(string str){
+	for(const auto key : input_keys){
+		if(str.find(key) != string::npos) return IN;
+	}
+	for(const auto key : clock_keys){
+		if(str.find(key) != string::npos) return CLK;
+	}
+	for(const auto key : output_keys){
+		if(str.find(key) != string::npos) return OUT;
+	}
+	return UNKNOWN;
+}
+
 void def2verilog::genV(){
 	// dummyGenV();
 	vf = verilogemit::VerilogFile(timeScale, topModuleName);
+	unordered_map<string, def_component> compmap;
+	unordered_map<string, unordered_map<string, size_t>> cell_PtlMap;
+
 	for(const auto comp : defComps){
-		continue;
+		if (comp.compName != "PAD")
+			vf.addInclude(NetListLoc[USC2LSmitllMap[comp.compName]]);
+		compmap.insert_or_assign(comp.name, comp);
 	}
-	for(const auto net : defNets){
-		continue;
+	size_t ptlid = 0;
+	for(auto net : defNets){
+		vf.addPtl({ptlid++, net.get_trans_delay()});
+		def_component fromComp = compmap[net.fromComp];
+		def_component ToComp = compmap[net.ToComp];
+		if (fromComp.compName == "PAD"){
+			vf.addPort({fromComp.name, str2pt(fromComp.name), ptlid});
+		} else {
+			cell_PtlMap[fromComp.name][USC2LSmitllMap[net.fromPin]] = ptlid;
+		}
+		if (ToComp.compName == "PAD"){
+			vf.addPort({ToComp.name, str2pt(ToComp.name), ptlid});
+		} else {
+			cell_PtlMap[ToComp.name][USC2LSmitllMap[net.ToPin]] = ptlid;
+		}
 	}
+	for(const auto comp : defComps){
+		if (comp.compName == "PAD") continue;
+		Cell cell;
+		cell.cellName = comp.name;
+		string compName = USC2LSmitllMap[comp.compName];
+		cell.moduleName = moduleNames[USC2LSmitllMap[comp.compName]];
+		for (auto portname : NetListPins[compName]){
+			cell.ports.push_back({portname, str2pt(portname), cell_PtlMap[comp.name][portname]});
+		}
+		vf.addCell(cell);
+	}
+	vf.emit("mymodule.v");
+	cout << "Done" << endl;
 }
 
 string verilog::vFileModuleName(string path){
@@ -73,6 +117,7 @@ int def2verilog::fetchData(string ConfigFileName, string DefFileName){
     const auto mainConfig       = toml::parse(ConfigFileName);
 	NetListLoc                  = toml::get<unordered_map<string, string>>(mainConfig.at("VERILOG_MODULE_LOCATIONS"));
 	NetListPins                 = toml::get<unordered_map<string, vector<string>>>(mainConfig.at("GATE_NETLIST"));
+	USC2LSmitllMap           	= toml::get<unordered_map<string, string>>(mainConfig.at("TRANSLATION_TABLE"));
 
 	const auto& tomlparameters  = toml::find(mainConfig, "PARAMETERS");
 	para_dangling_net           = toml::find<string>(tomlparameters, "dangling_net_name");
