@@ -26,6 +26,8 @@
 	input_name_keys        = ["IN", "In", "in", "a", "b", "CLK", "Clk", "clk"]
 	output_names_keys      = ["SUM", "Sum", "sum", "OUT", "Out", "out", "q", "m"] # Primarily used
 	clock_names_keys       = ["CLK", "Clk", "clk", "CLOCK", "Clock", "clock"]
+	topModuleName		   = "HalfAdder"
+	timescale			   = "1ps/100fs"
 
 [INPUT_PATTERN]	 # Input pattern/parameters
 	clock_freq      = 20.0   # [GHz] [float]
@@ -33,28 +35,16 @@
 	input_peak_time = 1000    # [ps]  [integer]
 
 [VERILOG_MODULE_LOCATIONS]
-	LSmitll_AND2T       = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_AND2T_v1p5.cir"
-	LSmitll_bufft       = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_bufft_v1p5.cir"
-	LSmitll_buff        = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_buff_v1p5.cir"
-	LSMITLL_CLKSPLTT    = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_CLKSPLTT_v1p5.cir"
-	LSMITLL_CLKSPLT     = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_CLKSPLT_v1p5.cir"
-	LSmitll_DCSFQ_PTLTX = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_DCSFQ_PTLTX_v1p5.cir"
-	LSmitll_DCSFQ       = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_DCSFQ_v1p5.cir"
-	LSmitll_DFFT        = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_DFFT_v1p5.cir"
-	LSmitll_JTLT        = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_JTLT_v1p5.cir"
-	LSmitll_MERGET      = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_MERGET_v1p5.cir"
-	LSmitll_NDROT       = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_NDROT_v1p5.cir"
-	LSmitll_NOTT        = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_NOTT_v1p5.cir"
-	LSmitll_OR2T        = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_OR2T_v1p5.cir"
-	LSmitll_PTLRX_SFQDC = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_PTLRX_SFQDC_v1p5.cir"
-	LSmitll_PLTRX       = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_ptlrx_v1p5.cir"
-	LSmitll_PLTTX       = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_ptltx_v1p5.cir"
-	LSmitll_SFQDC       = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_SFQDC_v1p5.cir"
-	LSmitll_SPLITT      = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_SPLITT_v1p5.cir"
-	LSmitll_XORT        = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_XORT_v1p5.cir"
-
-[VERILOG_MODULE_NAMES]
-	
+	LSmitll_JTLT     	= "data/modules/LSmitll_JTLT_v2p1_selfcontained.v"
+	LSmitll_MERGET   	= "data/modules/LSmitll_MERGET_v2p1_selfcontained.v"
+	LSmitll_SPLITT    	= "data/modules/LSmitll_SPLITT_v2p1_selfcontained.v"
+	LSmitll_DFFT      	= "data/modules/LSmitll_DFFT_v2p1_selfcontained.v"
+	LSmitll_NOTT     	= "data/modules/LSmitll_NOTT_v2p1_selfcontained.v"
+	LSmitll_AND2T    	= "data/modules/LSmitll_AND2T_v2p1_selfcontained.v"
+	LSmitll_OR2T     	= "data/modules/LSmitll_OR2T_v2p1_selfcontained.v"
+	LSmitll_XORT    	= "data/modules/LSmitll_XORT_v2p1_selfcontained.v"
+	LSmitll_buff  		= "data/modules/LSmitll_BUFFT_v2p1_selfcontained.v"
+	LSmitll_CLKSPLIT 	= "data/modules/LSmitll_SPLITT_v2p1_selfcontained.v"
 
 [NETLIST_LOCATIONS]
 	LSmitll_AND2T       = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_AND2T_v1p5.cir"

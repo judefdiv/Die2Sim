@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/build/Die2Sim",
             "args": ["-V", "data/ksa4_route.def", "-o", "data/ksa4.v"],
-            "stopAtEntry": true,
+            "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,

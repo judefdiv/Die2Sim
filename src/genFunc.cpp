@@ -274,3 +274,15 @@ string fileExtensionRenamer(string inName, string suffix){
 	foo = inName.insert(inName.length(), suffix);
 	return foo;
 }
+
+vector<string> split(string s, const string delimiter){
+	size_t pos = 0;
+	string token;
+	vector<string> outvec;
+	while ((pos = s.find(delimiter)) != string::npos) {
+		token = s.substr(0, pos);
+		outvec.push_back(token);
+		s.erase(0, pos + delimiter.length());
+	}
+	return outvec;
+}

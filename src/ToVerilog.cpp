@@ -43,13 +43,35 @@ void def2verilog::dummyGenV(){
 }
 
 void def2verilog::genV(){
-	dummyGenV();
+	// dummyGenV();
+	vf = verilogemit::VerilogFile(timeScale, topModuleName);
+	for(const auto comp : defComps){
+		continue;
+	}
+	for(const auto net : defNets){
+		continue;
+	}
+}
+
+string verilog::vFileModuleName(string path){
+	ifstream is = ifstream(path);
+	string line;
+	string modname;
+	while(!is.eof()){
+		getline(is, line);
+		const auto tokvec = split(line, " ");
+		for(auto it = tokvec.begin(); it != tokvec.end(); it++){
+			if ((*it).compare("module") == 0){
+				return *(++it);
+			}
+		}
+	}
+	return "notfound";
 }
 
 int def2verilog::fetchData(string ConfigFileName, string DefFileName){
     const auto mainConfig       = toml::parse(ConfigFileName);
-	NetListLoc                  = toml::get<unordered_map<string, string>>(mainConfig.at("NETLIST_LOCATIONS"));
-	USC2LSmitllMap              = toml::get<unordered_map<string, string>>(mainConfig.at("TRANSLATION_TABLE"));
+	NetListLoc                  = toml::get<unordered_map<string, string>>(mainConfig.at("VERILOG_MODULE_LOCATIONS"));
 	NetListPins                 = toml::get<unordered_map<string, vector<string>>>(mainConfig.at("GATE_NETLIST"));
 
 	const auto& tomlparameters  = toml::find(mainConfig, "PARAMETERS");
@@ -59,18 +81,19 @@ int def2verilog::fetchData(string ConfigFileName, string DefFileName){
 	input_keys                  = toml::find<vector<string>>(tomlparameters, "input_name_keys");
 	output_keys                 = toml::find<vector<string>>(tomlparameters, "output_names_keys");
 	clock_keys                  = toml::find<vector<string>>(tomlparameters, "clock_names_keys");
-
-    // Creates a map with the number of pins of each sub-circuit
-	unordered_map<string, vector<string>>::iterator it;
-	for(it = NetListPins.begin(); it != NetListPins.end(); it++){
-	  NetListPinNo.insert(pair<string,int>(it->first, it->second.size()));
-	}
+	timeScale					= toml::find<string>(tomlparameters, "timescale");
+	topModuleName				= toml::find<string>(tomlparameters, "topModuleName");
 
 	def_file defFileIn;
 	defFileIn.importFile(DefFileName);
 
 	defComps = defFileIn.getComps();
 	defNets = defFileIn.getNets();
+
+	for(auto kv : NetListLoc){
+		if (kv.second.compare("PAD") == 0) continue; 
+		moduleNames.insert_or_assign(kv.first, verilog::vFileModuleName(kv.second));
+	}
 
 	return 0;
 }
