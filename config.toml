@@ -17,17 +17,20 @@
 	# defFileName = "./KSA4_v1p5_vert_route.def"
 	# cirFileName = "./KSA4_v1p5_vert_fixedPTL.cir"
 
+	# defFileName = "./KSA4_v1p5_vert_route.def"
+	# vFileName = ./data/ksa4.v
+
 [PARAMETERS]
 	time_step              = 0.1 						# Time step in picoseconds(ps)
 	time_duration          = 2500.0					# Time step in picoseconds(ps)
-	speedconstant		   = 95.1					# um / ps
+	speedConstant		   = 95.1					# um / ps
 	dangling_net_name	   = "0"
 	force_PTL_Length       = false
 	force_PTL_length_value = 100000.0 			# sets a fixed track length
 	input_name_keys        = ["IN", "In", "in", "a", "b", "A", "B"]
-	output_names_keys      = ["SUM", "Sum", "sum", "OUT", "Out", "out", "q", "m", "r"] # Primarily used
+	output_names_keys      = ["SUM", "Sum", "sum", "OUT", "Out", "out", "q", "m"] # Primarily used
 	clock_names_keys       = ["CLK", "Clk", "clk", "CLOCK", "Clock", "clock"]
-	topModuleName		   = "HalfAdder"
+	topModuleName		   = "KSA4"
 	timescale			   = "1ps/100fs"
 
 [INPUT_PATTERN]	 # Input pattern/parameters
@@ -93,13 +96,13 @@
 	LSmitll_NDROT       = ["a", "b", "clk", "q"] # a - IN_SET; b - IN_RESET
 	LSmitll_NOTT        = ["a", "clk", "q"]
 	LSmitll_OR2T        = ["a", "b", "clk", "q"]
-	LSmitll_SPLITT      = ["a", "q", "r"]
+	LSmitll_SPLITT      = ["a", "q", "m"]
 	LSmitll_XORT        = ["a", "b", "clk", "q"]
 	PAD                 = ["P1"]								# does NOT EXIST, used for mapping in/out pins
 	LSmitll_bufft       = ["a", "q"]
 	LSmitll_buff        = ["a", "q"]
-	LSMITLL_CLKSPLTT    = ["a", "q", "r"]
-	LSMITLL_CLKSPLT     = ["a", "q", "r"]
+	LSMITLL_CLKSPLTT    = ["a", "q", "m"]
+	LSMITLL_CLKSPLT     = ["a", "q", "m"]
 	LSmitll_DCSFQ_PTLTX = ["a", "q"]
 	LSmitll_PTLRX_SFQDC = ["a", "q"]
 	LSmitll_SFQDC       = ["a", "q"]
@@ -128,7 +131,7 @@
 	IN_1    = "a"
 	IN_2    = "b"
 	OUT_1   = "q"
-	OUT_2   = "r"
+	OUT_2   = "m"
 	CLK     = "clk"
 
 	# DCSFQ       = "LSmitll_DCSFQ"

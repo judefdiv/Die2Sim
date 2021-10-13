@@ -55,7 +55,7 @@ verilogemit::PortType def2verilog::str2pt(string str){
 	return UNKNOWN;
 }
 
-void def2verilog::genV(){
+void def2verilog::genV(string vFilename){
 	// dummyGenV();
 	vf = verilogemit::VerilogFile(timeScale, topModuleName);
 	unordered_map<string, def_component> compmap;
@@ -66,9 +66,8 @@ void def2verilog::genV(){
 			vf.addInclude(NetListLoc[USC2LSmitllMap[comp.compName]]);
 		compmap.insert_or_assign(comp.name, comp);
 	}
-	size_t ptlid = 0;
+	size_t ptlid = 1;
 	for(auto net : defNets){
-		vf.addPtl({ptlid++, net.get_trans_delay()});
 		def_component fromComp = compmap[net.fromComp];
 		def_component ToComp = compmap[net.ToComp];
 		if (fromComp.compName == "PAD"){
@@ -81,6 +80,7 @@ void def2verilog::genV(){
 		} else {
 			cell_PtlMap[ToComp.name][USC2LSmitllMap[net.ToPin]] = ptlid;
 		}
+		vf.addPtl({ptlid++, net.get_track_length() / 1000.0 / speedConstant});
 	}
 	for(const auto comp : defComps){
 		if (comp.compName == "PAD") continue;
@@ -93,7 +93,7 @@ void def2verilog::genV(){
 		}
 		vf.addCell(cell);
 	}
-	vf.emit("mymodule.v");
+	vf.emit(vFilename);
 	cout << "Done" << endl;
 }
 
@@ -128,6 +128,7 @@ int def2verilog::fetchData(string ConfigFileName, string DefFileName){
 	clock_keys                  = toml::find<vector<string>>(tomlparameters, "clock_names_keys");
 	timeScale					= toml::find<string>(tomlparameters, "timescale");
 	topModuleName				= toml::find<string>(tomlparameters, "topModuleName");
+	speedConstant				= toml::find<double>(tomlparameters, "speedConstant");
 
 	def_file defFileIn;
 	defFileIn.importFile(DefFileName);
@@ -147,7 +148,7 @@ int verilog::executeDef2Verilog(string ConfigFileName, string DefFileName, strin
     cout << "Compiling LEF/DEF for Verilog" << endl;
 	def2verilog def2Verilog;
 	def2Verilog.fetchData(ConfigFileName, DefFileName);
-    def2Verilog.genV();
+    def2Verilog.genV(vFilename);
     return 0;
 }
 

@@ -26,6 +26,7 @@ namespace verilog{
             bool para_PTL_length_bool = false;
             float para_PTL_length     = -1;
             bool para_mergeIntoSubcir = true;
+            double speedConstant;
             vector<string> input_keys;
             vector<string> output_keys;
             vector<string> clock_keys;
@@ -40,7 +41,7 @@ namespace verilog{
         public:
             int fetchData(string ConfigFileName, string DefFileName);
             verilogemit::PortType str2pt(string str);
-            void genV();
+            void genV(string vFilename);
             void dummyGenV();
     };
 }

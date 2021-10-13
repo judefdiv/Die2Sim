@@ -47,8 +47,8 @@ void VerilogFile::emit(string filePath){
     }
     outfile << endl;
     int nPtls = ptls.size();
-    outfile << "reg  [" << nPtls << ":0] net_r = 0;" << endl;
-    outfile << "wire [" << nPtls << ":0] net_w;" << endl;
+    outfile << "reg  [" << nPtls + 1 << ":0] net_r = 0;" << endl;
+    outfile << "wire [" << nPtls + 1 << ":0] net_w;" << endl;
     for (Port inport : inPorts){
         outfile << "assign net_w[" << inport.ptlId;
         outfile << "] = " << inport.name << ";" << endl; 
@@ -71,10 +71,14 @@ void VerilogFile::emit(string filePath){
         vector<Port> ports = cell.ports;
         for (int i = 0; i < ports.size(); i++){
             Port port = ports[i];
-            if (port.portType == OUT){
-                outfile << "net_w[" << port.ptlId << "]";
+            outfile << "." << port.name << "(";
+            if (port.ptlId == 0){ //not connected
+                outfile << ")";
+            }
+            else if (port.portType == OUT){
+                outfile << "net_w[" << port.ptlId << "])";
             } else {
-                outfile << "net_r[" << port.ptlId << "]";
+                outfile << "net_r[" << port.ptlId << "])";
             }
             if (i+1 != ports.size()){
                 outfile << ", ";
