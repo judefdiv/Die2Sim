@@ -15,6 +15,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <unordered_map>
 #include <vector>
 #include <algorithm> // for sorting
 #include <fstream>
@@ -24,6 +25,7 @@
 #include <time.h>
 #include <cmath>
 #include "die2sim/genFunc.hpp"
+#include "die2sim/TestPattern.hpp"
 
 using namespace std;
 
@@ -34,6 +36,7 @@ class CompClass;
 constexpr auto c_ms = 299792458;
 constexpr auto vg = 89.552; // Propagation delay [μm/ps]
 constexpr auto speedConstant = 1 / 10e3 / vg;
+
 
 
 struct circuitInterface{
@@ -53,19 +56,16 @@ class JoSimFile{
 		vector<string> fileNamesImport;
 		vector<string> placeComp;
 		vector<string> placeNet;
+
+		unordered_map<string, string> USC2LSmitllMap;
+
+		TestPatternParams tpParams;
 		
 		bool mergeIntoSubcir = true;
 		vector<string> inputNameKeys;
 		vector<string> outputNameKeys;
 		vector<string> clockNameKeys;
 		vector<string> padNameKeys = {"PAD", "Pad", "pad"};
-		float timeStep = 0.1;
-		float timeDura = 1000;
-
-
-		float clkFreq     = 20;   // [GHz]
-		int inputPatPeak  = 600;	// [uA]
-		int inputPatPeakT = 35;   // [ps]
 
 		string subcktName;
 		vector<circuitInterface> subcktInt;
@@ -90,22 +90,19 @@ class JoSimFile{
 
 		int genCir(string fileName);
 
+		void setTpParams(TestPatternParams params){
+			tpParams = params;
+		}
+		void setTranslationTable(unordered_map<string, string> translationTable){
+      		USC2LSmitllMap = translationTable;
+    	};
+
 		void setMergeIntoSubcir(bool inVal){mergeIntoSubcir = inVal;};
 		void setNameKeys(vector<string> input, vector<string> output, vector<string> clock){
 			inputNameKeys = input;
 			outputNameKeys = output;
 			clockNameKeys = clock;
 		};
-		void setTimePara(float step, float duration){
-			timeStep = step;
-			timeDura = duration;
-		}
-
-		void setInputPat(float freq, int peak, int peakT){
-			clkFreq       = freq;
-			inputPatPeak  = peak;
-			inputPatPeakT = peakT;
-		}
 
 		bool fuzzySearch(string word, vector<string> keys); // can be made independent
 

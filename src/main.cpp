@@ -18,6 +18,7 @@
 #include "toml/toml.hpp"
 #include "die2sim/ToJosim.hpp"
 #include "die2sim/ToVerilog.hpp"
+#include "die2sim/TestPattern.hpp"
 
 #define versionNo 1.0
 #define parameterFile "config.toml"

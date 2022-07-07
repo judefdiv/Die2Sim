@@ -5,23 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch",
-            "type": "cppdbg",
+            "name": "Launch",
+            "type": "lldb",
             "request": "launch",
             "program": "${workspaceFolder}/build/Die2Sim",
-            "args": ["-V", "data/ksa4_route.def", "-o", "data/ksa4.v"],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ]
+            "args": ["-j", "out/KSA2_route.def", "-o", "out/KSA2_sim.cir"],
+            "cwd" : "/Users/edrich/development/code/viper-project",
         }
     ]
 }

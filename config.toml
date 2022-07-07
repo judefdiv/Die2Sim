@@ -21,8 +21,8 @@
 	# vFileName = ./data/ksa4.v
 
 [PARAMETERS]
-	time_step              = 0.1 						# Time step in picoseconds(ps)
-	time_duration          = 2500.0					# Time step in picoseconds(ps)
+	time_step              = 0.1 					# Time step in picoseconds(ps)
+	time_duration          = 3100.0					# Time duration in picoseconds(ps)
 	speedConstant		   = 95.1					# um / ps
 	dangling_net_name	   = "0"
 	force_PTL_Length       = false
@@ -34,9 +34,15 @@
 	timescale			   = "1ps/100fs"
 
 [INPUT_PATTERN]	 # Input pattern/parameters
-	clock_freq      = 20.0   # [GHz] [float]
-	input_peak      = 600   # [uA]	[integer]
-	input_peak_time = 1000    # [ps]  [integer]
+	clock_freq      = 15.0   					# [GHz] [float]
+	input_peak      = 600   					# [uA]	[integer]
+	input_peak_time = 1000    					# [ps]  [integer]
+	type			= 'random'					# {vecfile,random,exhaustive}
+	vec_file_path   = '/home/edrich/asdf.txt'	# vecfile path
+	seed			= 100						# the seed to give to a RNG for reproduceability
+	num_random		= 100						# the amount of random patterns to test
+	ac_delay		= 66						# time delay (ps) after clock pulse to wait before inserting pattern
+	bp_delay		= 1							# number of clock pulses between test patterns 
 
 [VERILOG_MODULE_LOCATIONS]
 	LSmitll_JTLT     	= "data/modules/LSmitll_JTLT_v2p1_selfcontained.v"

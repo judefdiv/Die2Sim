@@ -49,13 +49,8 @@ class def2josim{
     vector<string> input_keys;
     vector<string> output_keys;
     vector<string> clock_keys;
-    float time_step           = 0.1;
-    float time_duration       = 1000;
 
-    // Input pattern parameters
-    float clock_freq    = 1.0;
-    int input_peak      = 600;
-    int input_peak_time = 35;
+    TestPatternParams tpParams;
 
     // DEF file data
     vector<def_component> defComps;

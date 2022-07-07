@@ -74,8 +74,7 @@ void VerilogFile::emit(string filePath){
             outfile << "." << port.name << "(";
             if (port.ptlId == 0){ //not connected
                 outfile << ")";
-            }
-            else if (port.portType == OUT){
+            }else if (port.portType == OUT){
                 outfile << "net_w[" << port.ptlId << "])";
             } else {
                 outfile << "net_r[" << port.ptlId << "])";

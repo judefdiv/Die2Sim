@@ -1,0 +1,302 @@
+VERSION 5.8 ;
+BUSBITCHARS "[]" ;
+DIVIDERCHAR "/" ;
+UNITS
+	DATABASE MICRONS 1000 ;
+END UNITS
+MANUFACTURINGGRID 0.01 ;
+CLEARANCEMEASURE EUCLIDEAN ;
+USEMINSPACING OBS ON ;
+SITE CoreSite
+	CLASS CORE ;
+	SIZE 1 BY 160 ;
+END CoreSite
+LAYER M1
+	  TYPE ROUTING ;
+  	PITCH 10 ;
+  	WIDTH 5 ;
+  	SPACING 5 ;
+  	DIRECTION HORIZONTAL ;
+END M1
+LAYER M3
+	TYPE ROUTING ;
+  	PITCH 10 ;
+  	WIDTH 5 ;
+  	SPACING 5 ;
+  DIRECTION HORIZONTAL ;
+END M3
+VIA VIA13 DEFAULT
+  LAYER M1 ;
+    RECT -2.5 -2.5 2.5 2.5 ;
+  LAYER M3 ;
+    RECT -2.5 -2.5 2.5 2.5 ;
+  LAYER VIA13 ;
+    RECT -2.5 -2.5 2.5 2.5 ;
+END VIA13
+MACRO PAD
+  CLASS CORE ;
+  SIZE 30 by 30;
+  ORIGIN 0 0 ;
+  SYMMETRY X ;
+  SITE core 0 0 N DO 1 BY 1 STEP 0 0 ;
+  OBS
+    	LAYER M1 ;
+      		RECT 0 0 5 30 ;
+      		RECT 25 0 30 30 ;
+    	LAYER M3 ;
+      		RECT 0 0 5 30 ;
+      		RECT 25 0 30 30 ;
+  END
+  PIN a
+    	DIRECTION INOUT ;
+  	USE SIGNAL ;
+      	PORT
+        	LAYER M1 ;
+          	RECT 12.5 12.5 17.5 17.5 ;
+        	LAYER M3 ;
+          	RECT 12.5 12.5 17.5 17.5 ;
+      	END
+  END a  
+END PAD
+MACRO SPLITT
+  CLASS CORE ;
+  SIZE 50 by 70 ;
+  ORIGIN 0 0 ;
+  SYMMETRY X ;
+  SITE core 0 0 N DO 1 BY 1 STEP 0 0 ;
+  PIN a
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 12.5 52.5 17.5 57.5 ;
+        LAYER M3 ;
+          RECT 12.5 52.5 17.5 57.5 ;
+      END
+  END a
+  PIN q0
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 12.5 2.5 17.5 7.5 ;
+        LAYER M3 ;
+          RECT 12.5 2.5 17.5 7.5 ;
+      END
+  END q0
+  PIN q1
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 32.5 2.5 37.5 7.5 ;
+        LAYER M3 ;
+          RECT 32.5 2.5 37.5 7.5 ;
+      END
+  END q1
+END SPLITT
+MACRO DFFT
+  CLASS CORE ;
+  SIZE 80 by 70 ;
+  ORIGIN 0 0 ;
+  SYMMETRY X ;
+  SITE core 0 0 N DO 1 BY 1 STEP 0 0 ;
+  PIN clk
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 12.5 52.5 17.5 57.5 ;
+        LAYER M3 ;
+          RECT 12.5 52.5 17.5 57.5 ;
+      END
+  END clk
+  PIN a
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 12.5 12.5 17.5 17.5 ;
+        LAYER M3 ;
+          RECT 12.5 12.5 17.5 17.5 ;
+      END
+  END a
+  PIN q
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 62.5 12.5 67.5 17.5 ;
+        LAYER M3 ;
+          RECT 62.5 12.5 67.5 17.5 ;
+      END
+  END q
+END DFFT
+MACRO AND2T
+  CLASS CORE ;
+  SIZE 100 by 70 ;
+  ORIGIN 0 0 ;
+  SYMMETRY X ;
+  SITE core 0 0 N DO 1 BY 1 STEP 0 0 ;
+  PIN a
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 12.5 12.5 17.5 17.5 ;
+        LAYER M3 ;
+          RECT 12.5 12.5 17.5 17.5 ;
+      END
+  END a
+  PIN b
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 82.5 52.5 87.5 57.5 ;
+        LAYER M3 ;
+          RECT 82.5 52.5 87.5 57.5 ;
+      END
+  END b
+  PIN clk
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 12.5 52.5 17.5 57.5 ;
+        LAYER M3 ;
+          RECT 12.5 52.5 17.5 57.5 ;
+      END
+  END clk
+  PIN q
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 82.5 12.5 87.5 17.5 ;
+        LAYER M3 ;
+          RECT 82.5 12.5 87.5 17.5 ;
+      END
+  END q
+END AND2T
+MACRO OR2T
+  CLASS CORE ;
+  SIZE 100 by 70 ;
+  ORIGIN 0 0 ;
+  SYMMETRY X ;
+  SITE core 0 0 N DO 1 BY 1 STEP 0 0 ;
+  PIN a
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 12.5 12.5 17.5 17.5 ;
+        LAYER M3 ;
+          RECT 12.5 12.5 17.5 17.5 ;
+      END
+  END a
+  PIN b
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 12.5 52.5 17.5 57.5 ;
+        LAYER M3 ;
+          RECT 12.5 52.5 17.5 57.5 ;
+      END
+  END b
+  PIN clk
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 82.5 52.5 87.5 57.5 ;
+        LAYER M3 ;
+          RECT 82.5 52.5 87.5 57.5 ;
+      END
+  END clk
+  PIN q
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 82.5 12.5 87.5 17.5 ;
+        LAYER M3 ;
+          RECT 82.5 12.5 87.5 17.5 ;
+      END
+  END q
+END OR2T
+
+MACRO XORT
+  CLASS CORE ;
+  SIZE 100 by 70 ;
+  ORIGIN 0 0 ;
+  SYMMETRY X ;
+  SITE core 0 0 N DO 1 BY 1 STEP 0 0 ;
+  PIN a
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 12.5 52.5 17.5 57.5 ;
+        LAYER M3 ;
+          RECT 12.5 52.5 17.5 57.5 ;
+      END
+  END a
+  PIN b
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 12.5 12.5 17.5 17.5 ;
+        LAYER M3 ;
+          RECT 12.5 12.5 17.5 17.5 ;
+      END
+  END b
+  PIN clk
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 82.5 52.5 87.5 57.5 ;
+        LAYER M3 ;
+          RECT 82.5 52.5 87.5 57.5 ;
+      END
+  END clk
+  PIN q
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 82.5 12.5 87.5 17.5 ;
+        LAYER M3 ;
+          RECT 82.5 12.5 87.5 17.5 ;
+      END
+  END q
+END XORT
+MACRO PAD
+  CLASS CORE ;
+  SIZE 30 by 30 ;
+  ORIGIN 0 0 ;
+  SYMMETRY X ;
+  SITE core 0 0 N DO 1 BY 1 STEP 0 0 ;
+  OBS
+    LAYER M1 ;
+      RECT 0 0 5 30 ;
+      RECT 25 0 30 30 ;
+    LAYER M3 ;
+      RECT 0 0 5 30 ;
+      RECT 25 0 30 30 ;
+  END
+  PIN a
+    DIRECTION INOUT ;
+    USE SIGNAL ;
+      PORT
+        LAYER M1 ;
+          RECT 12.5 12.5 17.5 17.5 ;
+        LAYER M3 ;
+          RECT 12.5 12.5 17.5 17.5 ;
+      END
+  END a 
+END PAD
+END LIBRARY

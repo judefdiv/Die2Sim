@@ -10,6 +10,7 @@
  */
 
 #include "die2sim/ParserJosim.hpp"
+#include "die2sim/TestPattern.hpp"
 
 /**
  * [JoSimFile::genCir - Generates the final .cir file in the correct formate]
@@ -161,10 +162,20 @@ string JoSimFile::genInstance(){
   ss << makeHeader("Inputs") << endl;
 
   unsigned int inputCnt = 1;
-  int clkPeriod = 1000/clkFreq; // [pico-seconds]
-  const string clkInput = "pulse(0 " + to_string(inputPatPeak) + "u 50p 10p 9p 1p " + to_string(clkPeriod) + "p)";
-  const string padInput = "pwl(0 0 " + to_string(inputPatPeakT-5) + "p 0 " + to_string(inputPatPeakT) + "p " + to_string(inputPatPeak) + "u " + to_string(inputPatPeakT+5) + "p 0)";
+  int clkPeriod = 1000/tpParams.clkFreq; // [pico-seconds]
+  int clkDelay = tpParams.clkDelay; //picoseconds
+  const string clkInput = 
+      "pulse(0 " + to_string(tpParams.inputPatPeak) 
+      + "u " + to_string(clkDelay) + "p 10p 9p 1p " + to_string(clkPeriod) + "p)";
 
+  // const string padInput = "pwl(0 0 " 
+  //     + to_string(inputPatPeakT-5) 
+  //     + "p 0 " + to_string(inputPatPeakT) 
+  //     + "p " + to_string(inputPatPeak) 
+  //     + "u " + to_string(inputPatPeakT+5) 
+  //     + "p 0)";
+
+  auto vecfile = TestPattern::parseVecFile(tpParams.vec_file_path);
 
   for(const auto &it: this->subcktInt){
   // for(const auto &itPad: this->subcktNetDes){
@@ -178,14 +189,13 @@ string JoSimFile::genInstance(){
       ss  << setw(16) << "I" + it.netDes << " 0 " << inputCnt << "000 " << clkInput << endl;
     }
     else{
-      ss << setw(16) << "I" + it.netDes << " 0 " << inputCnt << "000 " << padInput << endl;
+      ss  << setw(16) << "I" + it.netDes << " 0 " << inputCnt << "000 " 
+          << TestPattern::josimPwlLine(it.netDes, vecfile, tpParams) 
+          << endl;
     }
 
     // DCSFQ
-    ss << setw(16) << "XDCSFQ" + it.netDes << setw(15) << " LSMITLL_DCSFQ " << inputCnt << "000 " << inputCnt << "001" << endl;
-
-    // JTL
-    ss << setw(16) << "XJTL" + it.netDes << setw(15) << " LSmitll_ptltx " << inputCnt << "001 " << it.netDes << endl;
+    ss << setw(16) << "XDCSFQ" + it.netDes << setw(15) << " " + USC2LSmitllMap["DCSFQ"] + " " << inputCnt << "000 " << it.netDes << endl;
 
     ss << endl;
 
@@ -201,7 +211,7 @@ string JoSimFile::genInstance(){
   for(const auto &it: this->subcktInt){
     if(fuzzySearch(it.netDes, outputNameKeys) == true){
       // ss << "X" << it.netDes << " LSmitll_ptlrx " << it.netName << " " << it.netDes << endl;
-      ss << "X" << it.netDes << " LSmitll_ptlrx " << it.netDes << "_X " << it.netDes << endl;
+      ss << "XSFQDC" << it.netDes << " " + USC2LSmitllMap["SFQDC"] + " " << it.netDes << "_X " << it.netDes << endl;
     }
   }
 
@@ -212,7 +222,7 @@ string JoSimFile::genInstance(){
 
   ss << makeHeader("Control") << endl;
 
-  ss << ".tran " << this->timeStep << "p " << this->timeDura << "p" << endl;
+  ss << ".tran " << this->tpParams.timeStep << "p " << this->tpParams.timeDura << "p" << endl;
 
   /**
    * Printing the data
@@ -227,7 +237,10 @@ string JoSimFile::genInstance(){
   vector<string> lines;
 
   for(const auto it: this->subcktInt){
-    lines.push_back(".print NODEV " + it.netDes + " 0");
+    if (fuzzySearch(it.netDes, outputNameKeys))
+      lines.push_back(".print NODEV " + it.netDes + "_X 0");
+    else
+      lines.push_back(".print NODEV " + it.netDes + " 0");
   }
 
   sort(lines.begin(), lines.end());
