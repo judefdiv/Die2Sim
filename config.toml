@@ -7,16 +7,6 @@
 # Description: Configuration file for defining stuffs
 # File:				 config.toml
 
-[FILE_LOCATIONS]
-	# defFileName = "./data/USC_new/arrmult4_route.def"
-	# cirFileName = "./data/USC_new/arrmult4.cir"	# output file name
-
-	# defFileName = "./arrmult4_route.def"
-	# cirFileName = "./arrmult4_route.cir"
-
-	# defFileName = "./KSA4_v1p5_vert_route.def"
-	# cirFileName = "./KSA4_v1p5_vert_fixedPTL.cir"
-
 [PARAMETERS]
 	time_step              = 0.1 						# Time step in picoseconds(ps)
 	time_duration          = 2500.0					# Time step in picoseconds(ps)
@@ -52,20 +42,6 @@
 	LSmitll_SFQDC       = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_SFQDC_v1p5.cir"
 	LSmitll_SPLITT      = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_SPLITT_v1p5.cir"
 	LSmitll_XORT        = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_XORT_v1p5.cir"
-
-	# OLD
-	# LSmitll_AND2T   = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_AND2T.cir"
-	# LSmitll_DCSFQ   = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_DCSFQ.cir"
-	# LSmitll_DFFT    = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_DFFT.cir"
-	# LSmitll_MERGET  = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_MERGET.cir"
-	# LSmitll_NOTT    = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_NOTT.cir"
-	# LSmitll_OR2T    = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_OR2T.cir"
-	# LSmitll_SPLITT  = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_SPLITT.cir"
-	# LSmitll_XORT    = "data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_XORT.cir"
-	# LSmitll_JTLT    =	"data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_jtlt.cir"
-	# LSmitll_NDROT   =	"data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_NDROT.cir"
-	# LSmitll_PLTTX   =	"data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_PTLTX.cir"
-	# LSmitll_PLTRX   =	"data/cell_lib/RSFQ_LS_MITLL_1_4_V2/LSmitll_PTLRX.cir"
 
 # The arrays shows the pins of the cells for the SPICE sub-circuits.
 # The order of the pins/ports are important due to mapping
