@@ -58,7 +58,7 @@ int def2josim::fetchData(string ConfigFileName, string DefFileName){
 
 	tpParams.timeStep              = toml::find<float>(tomlparameters, "time_step");
 	tpParams.timeDura              = toml::find<float>(tomlparameters, "time_duration");
-
+	speedConstant					= toml::find<double>(tomlparameters, "speedConstant");
 
 	const auto& tomlInputpattern 	= toml::find(mainConfig, "INPUT_PATTERN");
 	tpParams.clkDelay				= toml::find<float>(tomlInputpattern, "clock_delay");
@@ -103,6 +103,8 @@ int def2josim::genCir(string fileName){
 	for(const auto & [netName, netLoc]: this->NetListLoc){
 	  joFile.importCir(netLoc);
 	}
+
+	joFile.setSpeedConstant(this->speedConstant);
 
 	joFile.setTranslationTable(this->USC2LSmitllMap);
 

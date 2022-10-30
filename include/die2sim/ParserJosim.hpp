@@ -33,12 +33,6 @@ class JoSimFile;
 class PTLclass;
 class CompClass;
 
-constexpr auto c_ms = 299792458;
-constexpr auto vg = 89.552; // Propagation delay [μm/ps]
-constexpr auto speedConstant = 1 / 10e3 / vg;
-
-
-
 struct circuitInterface{
 	string netName   = "";	// Internal name of the net
 	string netDes    = "";	// Human readable name
@@ -60,6 +54,8 @@ class JoSimFile{
 		unordered_map<string, string> USC2LSmitllMap;
 
 		TestPatternParams tpParams;
+
+		double speedConstant;
 		
 		bool mergeIntoSubcir = true;
 		vector<string> inputNameKeys;
@@ -108,6 +104,7 @@ class JoSimFile{
 
 		void printPTLstats();
 		void exportTDelay(const string &fileName);
+		void setSpeedConstant(double speedConstant){this->speedConstant = speedConstant;};
 
 		void to_str();
 };
@@ -132,21 +129,19 @@ class PTLclass{
 	private:
 		string name;
 		string nameNet;
-
+		double speedConstant;
 		int length;
-		// const double speedConstant = 3 * pow(10, 3) / c_ms;  // USC
-		const double speedConstant = 1 / 10e3 / vg;   //SANDIA; must convert DBunits to um
 
 	public:
 		PTLclass(){};
 		~PTLclass(){};
 
-		int create(const string &PTLname, const string &NetName, int PTLlength);
+		int create(const string &PTLname, const string &NetName, int PTLlength, double speedConstant);
 		string to_cir();
 		string getNameNet(){return nameNet;};
 		string to_cir_replace_a_net(string netAName);
 		int getLength(){return this->length;};
-		double getTDelay(){return this->length * speedConstant;};
+		double getTDdelay(){return this->length / 1000.0 / speedConstant;};
 };
 
 int cpFile(string fromFile, string toFile);

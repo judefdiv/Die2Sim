@@ -9,8 +9,8 @@
             "type": "lldb",
             "request": "launch",
             "program": "${workspaceFolder}/build/Die2Sim",
-            "args": ["-j", "out/KSA2_route.def", "-o", "out/KSA2_sim.cir"],
-            "cwd" : "/Users/edrich/development/code/viper-project",
+            "args": ["-j", "out/RCA2_route.def", "-o", "out/RCA2_sim.cir"],
+            "cwd" : "/Users/edrich/development/code/viper-projects/rca2",
         }
     ]
 }

@@ -1,5 +1,5 @@
 /**
- * Author:  		Jude de Villiers
+ * Author:  		Jude de Villiers, Edrich Verburg
  * Origin:  		E&E Engineering - Stellenbosch University
  * For:					Supertools, Coldflux Project - IARPA
  * Created: 		2019-04-25
@@ -323,7 +323,7 @@ int JoSimFile::pushComp(string name, string compTypeName, vector<string> &netNam
 int JoSimFile::pushPTL(const string &name, const string &netName, unsigned int len){
   PTLclass fooPTL;
 
-  fooPTL.create(name, netName, len);
+  fooPTL.create(name, netName, len, this->speedConstant);
   this->PTLs.push_back(fooPTL);
 
   return 0;
@@ -389,7 +389,6 @@ void JoSimFile::printPTLstats(){
   unsigned int lenCnt = 0;       // Number of PTLs
   unsigned long lenSum = 0;        // The sum of the PTL length
   // float stdVar = 0;              // Standards variance
-  const double speedConstant = 1 / pow(10, 3) / vg;
 
   cout << "Calculating stats on the transmission lines." << endl;
   lenCnt = this->PTLs.size();
@@ -415,10 +414,10 @@ void JoSimFile::printPTLstats(){
 
   cout << "PTL Delay Statistics:" << endl;
   cout << "\tCnt: "  << lenCnt << endl;
-  cout << "\tMin: "  << lenMin * speedConstant << "ps" << endl;
-  cout << "\tMean: "  << lenMean * speedConstant << "ps" << endl;
-  cout << "\tMax: "  << lenMax * speedConstant << "ps" << endl;
-  cout << "\tTotal: "  << lenSum /1000 << "nm" << endl;
+  cout << "\tMin: "  << lenMin / 1000.0 / this->speedConstant << "ps" << endl;
+  cout << "\tMean: "  << lenMean / 1000.0 / this->speedConstant << "ps" << endl;
+  cout << "\tMax: "  << lenMax / 1000.0 / this->speedConstant << "ps" << endl;
+  cout << "\tTotal: "  << lenSum / 1000 << "nm" << endl;
   // cout << "\tstdVar: "  << stdVar << endl;
 
 }
@@ -435,10 +434,10 @@ void JoSimFile::exportTDelay(const string &fileName){
   
   for(auto itPTL = this->PTLs.begin(); itPTL != this->PTLs.end(); itPTL++){
     if(itPTL != this->PTLs.end()-1){
-      outfile << (*itPTL).getTDelay() << ",";
+      outfile << (*itPTL).getTDdelay() << ",";
     }
     else{
-      outfile << (*itPTL).getTDelay();
+      outfile << (*itPTL).getTDdelay();
     }
   }
 
@@ -492,10 +491,11 @@ string CompClass::to_cir(){
  * @return           [0 - Good; 1 - Error]
  */
 
-int PTLclass::create(const string &PTLname, const string &NetName, int PTLlength){
+int PTLclass::create(const string &PTLname, const string &NetName, int PTLlength, double speedConstant){
   this->name = PTLname;
   this->nameNet = NetName;
   this->length = PTLlength;
+  this->speedConstant = speedConstant;
 
   return 0;
 }
@@ -515,7 +515,7 @@ string PTLclass::to_cir(){
   ss << setw(10) << " " + nameNet + "B";
   ss << setw(4)  << " 0";
 
-  double foo = this->length * speedConstant;
+  double foo = this->getTDdelay();
 
   if(foo < 1.0){
     ss << setprecision(1);
@@ -627,7 +627,7 @@ string makeFileHeader(string someText){
 
 
   foo =  "* JoSIM file generated with Die2Sim, " + (string)asctime(timeinfo);
-  foo += "\n* Jude de Villiers, Stellenbosch University\n\n";
+  foo += "\n* Jude de Villiers, Edrich Verburg, Stellenbosch University\n\n";
 
   return foo;
 }

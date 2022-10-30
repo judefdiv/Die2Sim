@@ -41,6 +41,8 @@ class def2josim{
     unordered_map<string, vector<string>> NetListPins;
     unordered_map<string, int> NetListPinNo;
 
+    double speedConstant;
+
     // config parameters
     string para_dangling_net  = "????";
     bool para_PTL_length_bool = false;
