@@ -38,5 +38,6 @@ string removeLTwhite(string inStr);
 string fileRenamer(string inName, string preFix, string suffix);
 string fileExtensionRenamer(string inName, string suffix);
 string makeHeader(string HeaderName);
+vector<string> split(string str, string delimiter);
 
 #endif

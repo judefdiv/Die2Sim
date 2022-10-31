@@ -15,6 +15,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <unordered_map>
 #include <vector>
 #include <algorithm> // for sorting
 #include <fstream>
@@ -24,17 +25,13 @@
 #include <time.h>
 #include <cmath>
 #include "die2sim/genFunc.hpp"
+#include "die2sim/TestPattern.hpp"
 
 using namespace std;
 
 class JoSimFile;
 class PTLclass;
 class CompClass;
-
-constexpr auto c_ms = 299792458;
-constexpr auto vg = 89.552; // Propagation delay [μm/ps]
-constexpr auto speedConstant = 1 / pow(10, 3) / vg;
-
 
 struct circuitInterface{
 	string netName   = "";	// Internal name of the net
@@ -53,19 +50,18 @@ class JoSimFile{
 		vector<string> fileNamesImport;
 		vector<string> placeComp;
 		vector<string> placeNet;
+
+		unordered_map<string, string> USC2LSmitllMap;
+
+		TestPatternParams tpParams;
+
+		double speedConstant;
 		
 		bool mergeIntoSubcir = true;
 		vector<string> inputNameKeys;
 		vector<string> outputNameKeys;
 		vector<string> clockNameKeys;
 		vector<string> padNameKeys = {"PAD", "Pad", "pad"};
-		float timeStep = 0.1;
-		float timeDura = 1000;
-
-
-		float clkFreq     = 20;   // [GHz]
-		int inputPatPeak  = 600;	// [uA]
-		int inputPatPeakT = 35;   // [ps]
 
 		string subcktName;
 		vector<circuitInterface> subcktInt;
@@ -90,27 +86,25 @@ class JoSimFile{
 
 		int genCir(string fileName);
 
+		void setTpParams(TestPatternParams params){
+			tpParams = params;
+		}
+		void setTranslationTable(unordered_map<string, string> translationTable){
+      		USC2LSmitllMap = translationTable;
+    	};
+
 		void setMergeIntoSubcir(bool inVal){mergeIntoSubcir = inVal;};
 		void setNameKeys(vector<string> input, vector<string> output, vector<string> clock){
 			inputNameKeys = input;
 			outputNameKeys = output;
 			clockNameKeys = clock;
 		};
-		void setTimePara(float step, float duration){
-			timeStep = step;
-			timeDura = duration;
-		}
-
-		void setInputPat(float freq, int peak, int peakT){
-			clkFreq       = freq;
-			inputPatPeak  = peak;
-			inputPatPeakT = peakT;
-		}
 
 		bool fuzzySearch(string word, vector<string> keys); // can be made independent
 
 		void printPTLstats();
 		void exportTDelay(const string &fileName);
+		void setSpeedConstant(double speedConstant){this->speedConstant = speedConstant;};
 
 		void to_str();
 };
@@ -135,21 +129,19 @@ class PTLclass{
 	private:
 		string name;
 		string nameNet;
-
+		double speedConstant;
 		int length;
-		// const double speedConstant = 3 * pow(10, 3) / c_ms;  // USC
-		const double speedConstant = 1 / pow(10, 3) / vg;   //SANDIA; must convert DBunits to um
 
 	public:
 		PTLclass(){};
 		~PTLclass(){};
 
-		int create(const string &PTLname, const string &NetName, int PTLlength);
+		int create(const string &PTLname, const string &NetName, int PTLlength, double speedConstant);
 		string to_cir();
 		string getNameNet(){return nameNet;};
 		string to_cir_replace_a_net(string netAName);
 		int getLength(){return this->length;};
-		double getTDelay(){return this->length * speedConstant;};
+		double getTDdelay(){return this->length / 1000.0 / speedConstant;};
 };
 
 int cpFile(string fromFile, string toFile);

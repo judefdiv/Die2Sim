@@ -10,6 +10,8 @@
  */
 
 #include "die2sim/ToJosim.hpp"
+#include "die2sim/ParserJosim.hpp"
+#include "die2sim/TestPattern.hpp"
 
 /**
  * [executeDef2Josim - A script for converting DEF file to JoSIM]
@@ -54,14 +56,17 @@ int def2josim::fetchData(string ConfigFileName, string DefFileName){
 	output_keys                = toml::find<vector<string>>(tomlparameters, "output_names_keys");
 	clock_keys                 = toml::find<vector<string>>(tomlparameters, "clock_names_keys");
 
-	time_step                  = toml::find<float>(tomlparameters, "time_step");
-	time_duration              = toml::find<float>(tomlparameters, "time_duration");
+	tpParams.timeStep              = toml::find<float>(tomlparameters, "time_step");
+	tpParams.timeDura              = toml::find<float>(tomlparameters, "time_duration");
+	speedConstant					= toml::find<double>(tomlparameters, "speedConstant");
 
-
-	const auto& tomlInputpattern = toml::find(mainConfig, "INPUT_PATTERN");
-	clock_freq                   = toml::find<float>(tomlInputpattern, "clock_freq");
-	input_peak                   = toml::find<int>(tomlInputpattern, "input_peak");
-	input_peak_time              = toml::find<int>(tomlInputpattern, "input_peak_time");
+	const auto& tomlInputpattern 	= toml::find(mainConfig, "INPUT_PATTERN");
+	tpParams.clkDelay				= toml::find<float>(tomlInputpattern, "clock_delay");
+	tpParams.clkFreq 				= toml::find<float>(tomlInputpattern, "clock_freq");
+	tpParams.inputPatPeak			= toml::find<int>(tomlInputpattern, "input_peak");
+	tpParams.ac_delay				= toml::find<float>(tomlInputpattern, "ac_delay");
+	tpParams.bp_delay			    = toml::find<int>(tomlInputpattern, "bp_delay");
+	tpParams.vec_file_path			= toml::find<string>(tomlInputpattern, "vec_file_path");
 
   // Creates a map with the number of pins of each sub-circuit
 	unordered_map<string, vector<string>>::iterator it;
@@ -99,12 +104,14 @@ int def2josim::genCir(string fileName){
 	  joFile.importCir(netLoc);
 	}
 
+	joFile.setSpeedConstant(this->speedConstant);
+
+	joFile.setTranslationTable(this->USC2LSmitllMap);
+
 	joFile.createSubckt("Created_subckt");
 	// joFile.setMergeIntoSubcir(para_mergeIntoSubcir);
 	joFile.setNameKeys(input_keys, output_keys, clock_keys);
-	joFile.setTimePara(time_step, time_duration);
-	joFile.setInputPat(clock_freq, input_peak, input_peak_time);
-
+	joFile.setTpParams(tpParams);
 	this->stitchCompNets();
 
 	joFile.printPTLstats();

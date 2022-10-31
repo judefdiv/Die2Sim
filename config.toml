@@ -8,19 +8,40 @@
 # File:				 config.toml
 
 [PARAMETERS]
-	time_step              = 0.1 						# Time step in picoseconds(ps)
-	time_duration          = 2500.0					# Time step in picoseconds(ps)
-	dangling_net_name			 = "0"
+	time_step              = 0.1 					# Time step in picoseconds(ps)
+	time_duration          = 3100.0					# Time duration in picoseconds(ps)
+	speedConstant		   = 95.1					# um / ps
+	dangling_net_name	   = "0"
 	force_PTL_Length       = false
 	force_PTL_length_value = 100000.0 			# sets a fixed track length
-	input_name_keys        = ["IN", "In", "in", "a", "b", "CLK", "Clk", "clk"]
+	input_name_keys        = ["IN", "In", "in", "a", "b", "A", "B"]
 	output_names_keys      = ["SUM", "Sum", "sum", "OUT", "Out", "out", "q", "m"] # Primarily used
 	clock_names_keys       = ["CLK", "Clk", "clk", "CLOCK", "Clock", "clock"]
+	topModuleName		   = "KSA4"
+	timescale			   = "1ps/100fs"
 
 [INPUT_PATTERN]	 # Input pattern/parameters
-	clock_freq      = 20.0   # [GHz] [float]
-	input_peak      = 600   # [uA]	[integer]
-	input_peak_time = 1000    # [ps]  [integer]
+	clock_freq      = 15.0   					# [GHz] [float]
+	input_peak      = 600   					# [uA]	[integer]
+	input_peak_time = 1000    					# [ps]  [integer]
+	type			= 'random'					# {vecfile,random,exhaustive}
+	vec_file_path   = '/home/edrich/asdf.txt'	# vecfile path
+	seed			= 100						# the seed to give to a RNG for reproduceability
+	num_random		= 100						# the amount of random patterns to test
+	ac_delay		= 66						# time delay (ps) after clock pulse to wait before inserting pattern
+	bp_delay		= 1							# number of clock pulses between test patterns 
+
+[VERILOG_MODULE_LOCATIONS]
+	LSmitll_JTLT     	= "data/modules/LSmitll_JTLT_v2p1_selfcontained.v"
+	LSmitll_MERGET   	= "data/modules/LSmitll_MERGET_v2p1_selfcontained.v"
+	LSmitll_SPLITT    	= "data/modules/LSmitll_SPLITT_v2p1_selfcontained.v"
+	LSmitll_DFFT      	= "data/modules/LSmitll_DFFT_v2p1_selfcontained.v"
+	LSmitll_NOTT     	= "data/modules/LSmitll_NOTT_v2p1_selfcontained.v"
+	LSmitll_AND2T    	= "data/modules/LSmitll_AND2T_v2p1_selfcontained.v"
+	LSmitll_OR2T     	= "data/modules/LSmitll_OR2T_v2p1_selfcontained.v"
+	LSmitll_XORT    	= "data/modules/LSmitll_XORT_v2p1_selfcontained.v"
+	LSmitll_buff  		= "data/modules/LSmitll_BUFFT_v2p1_selfcontained.v"
+	LSmitll_CLKSPLIT 	= "data/modules/LSmitll_SPLITT_v2p1_selfcontained.v"
 
 [NETLIST_LOCATIONS]
 	LSmitll_AND2T       = "data/cell_lib/RSFQ_LS_MITLL_v1p5p1/LSmitll_AND2T_v1p5.cir"
@@ -54,13 +75,13 @@
 	LSmitll_NDROT       = ["a", "b", "clk", "q"] # a - IN_SET; b - IN_RESET
 	LSmitll_NOTT        = ["a", "clk", "q"]
 	LSmitll_OR2T        = ["a", "b", "clk", "q"]
-	LSmitll_SPLITT      = ["a", "q", "r"]
+	LSmitll_SPLITT      = ["a", "q", "m"]
 	LSmitll_XORT        = ["a", "b", "clk", "q"]
 	PAD                 = ["P1"]								# does NOT EXIST, used for mapping in/out pins
 	LSmitll_bufft       = ["a", "q"]
 	LSmitll_buff        = ["a", "q"]
-	LSMITLL_CLKSPLTT    = ["a", "q", "r"]
-	LSMITLL_CLKSPLT     = ["a", "q", "r"]
+	LSMITLL_CLKSPLTT    = ["a", "q", "m"]
+	LSMITLL_CLKSPLT     = ["a", "q", "m"]
 	LSmitll_DCSFQ_PTLTX = ["a", "q"]
 	LSmitll_PTLRX_SFQDC = ["a", "q"]
 	LSmitll_SFQDC       = ["a", "q"]
@@ -89,7 +110,7 @@
 	IN_1    = "a"
 	IN_2    = "b"
 	OUT_1   = "q"
-	OUT_2   = "r"
+	OUT_2   = "m"
 	CLK     = "clk"
 
 	# DCSFQ       = "LSmitll_DCSFQ"

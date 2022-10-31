@@ -348,7 +348,7 @@ int def_file::to_def(const string &fileName){
   defFile << "END COMPONENTS" << endl << endl;
 
   // ----------------------------- Routes/Nets -----------------------------
-  defFile << "NETS " << this->nets.size() + " ;" << endl;
+  defFile << "NETS " << to_string(this->nets.size()) << " ;" << endl;
   for(auto &foo: this->nets){
     defFile << foo.to_def() << endl;
   }
@@ -391,11 +391,10 @@ int def_file::to_jpg(const std::string &fileName){
   			if(fooNet.get_varToPin().find(outStr) == string::npos){
 	  			fromSTR.push_back(fooNet.get_varFromComp());
 				  toSTR.push_back(fooNet.get_varToComp());
-				}
-				else{
-	  			toSTR.push_back(fooNet.get_varFromComp());
-				  fromSTR.push_back(fooNet.get_varToComp());
-				}
+			}else{
+			toSTR.push_back(fooNet.get_varFromComp());
+				fromSTR.push_back(fooNet.get_varToComp());
+			}
   		}
   		else{
   			toSTR.push_back(fooNet.get_varFromComp());

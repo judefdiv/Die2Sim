@@ -1,5 +1,5 @@
 /**
- * Author:  		Jude de Villiers
+ * Author:  		Jude de Villiers, Edrich Verburg
  * Origin:  		E&E Engineering - Stellenbosch University
  * For:					Supertools, Coldflux Project - IARPA
  * Created: 		2019-04-25
@@ -10,6 +10,7 @@
  */
 
 #include "die2sim/ParserJosim.hpp"
+#include "die2sim/TestPattern.hpp"
 
 /**
  * [JoSimFile::genCir - Generates the final .cir file in the correct formate]
@@ -161,10 +162,20 @@ string JoSimFile::genInstance(){
   ss << makeHeader("Inputs") << endl;
 
   unsigned int inputCnt = 1;
-  int clkPeriod = 1000/clkFreq; // [pico-seconds]
-  const string clkInput = "pulse(0 " + to_string(inputPatPeak) + "u 50p 10p 9p 1p " + to_string(clkPeriod) + "p)";
-  const string padInput = "pwl(0 0 " + to_string(inputPatPeakT-5) + "p 0 " + to_string(inputPatPeakT) + "p " + to_string(inputPatPeak) + "u " + to_string(inputPatPeakT+5) + "p 0)";
+  int clkPeriod = 1000/tpParams.clkFreq; // [pico-seconds]
+  int clkDelay = tpParams.clkDelay; //picoseconds
+  const string clkInput = 
+      "pulse(0 " + to_string(tpParams.inputPatPeak) 
+      + "u " + to_string(clkDelay) + "p 10p 9p 1p " + to_string(clkPeriod) + "p)";
 
+  // const string padInput = "pwl(0 0 " 
+  //     + to_string(inputPatPeakT-5) 
+  //     + "p 0 " + to_string(inputPatPeakT) 
+  //     + "p " + to_string(inputPatPeak) 
+  //     + "u " + to_string(inputPatPeakT+5) 
+  //     + "p 0)";
+
+  auto vecfile = TestPattern::parseVecFile(tpParams.vec_file_path);
 
   for(const auto &it: this->subcktInt){
   // for(const auto &itPad: this->subcktNetDes){
@@ -178,14 +189,13 @@ string JoSimFile::genInstance(){
       ss  << setw(16) << "I" + it.netDes << " 0 " << inputCnt << "000 " << clkInput << endl;
     }
     else{
-      ss << setw(16) << "I" + it.netDes << " 0 " << inputCnt << "000 " << padInput << endl;
+      ss  << setw(16) << "I" + it.netDes << " 0 " << inputCnt << "000 " 
+          << TestPattern::josimPwlLine(it.netDes, vecfile, tpParams) 
+          << endl;
     }
 
     // DCSFQ
-    ss << setw(16) << "XDCSFQ" + it.netDes << setw(15) << " LSMITLL_DCSFQ " << inputCnt << "000 " << inputCnt << "001" << endl;
-
-    // JTL
-    ss << setw(16) << "XJTL" + it.netDes << setw(15) << " LSmitll_ptltx " << inputCnt << "001 " << it.netDes << endl;
+    ss << setw(16) << "XDCSFQ" + it.netDes << setw(15) << " " + USC2LSmitllMap["DCSFQ"] + " " << inputCnt << "000 " << it.netDes << endl;
 
     ss << endl;
 
@@ -201,7 +211,7 @@ string JoSimFile::genInstance(){
   for(const auto &it: this->subcktInt){
     if(fuzzySearch(it.netDes, outputNameKeys) == true){
       // ss << "X" << it.netDes << " LSmitll_ptlrx " << it.netName << " " << it.netDes << endl;
-      ss << "X" << it.netDes << " LSmitll_ptlrx " << it.netDes << "_X " << it.netDes << endl;
+      ss << "XSFQDC" << it.netDes << " " + USC2LSmitllMap["SFQDC"] + " " << it.netDes << "_X " << it.netDes << endl;
     }
   }
 
@@ -212,7 +222,7 @@ string JoSimFile::genInstance(){
 
   ss << makeHeader("Control") << endl;
 
-  ss << ".tran " << this->timeStep << "p " << this->timeDura << "p" << endl;
+  ss << ".tran " << this->tpParams.timeStep << "p " << this->tpParams.timeDura << "p" << endl;
 
   /**
    * Printing the data
@@ -227,7 +237,10 @@ string JoSimFile::genInstance(){
   vector<string> lines;
 
   for(const auto it: this->subcktInt){
-    lines.push_back(".print NODEV " + it.netDes + " 0");
+    if (fuzzySearch(it.netDes, outputNameKeys))
+      lines.push_back(".print NODEV " + it.netDes + "_X 0");
+    else
+      lines.push_back(".print NODEV " + it.netDes + " 0");
   }
 
   sort(lines.begin(), lines.end());
@@ -310,7 +323,7 @@ int JoSimFile::pushComp(string name, string compTypeName, vector<string> &netNam
 int JoSimFile::pushPTL(const string &name, const string &netName, unsigned int len){
   PTLclass fooPTL;
 
-  fooPTL.create(name, netName, len);
+  fooPTL.create(name, netName, len, this->speedConstant);
   this->PTLs.push_back(fooPTL);
 
   return 0;
@@ -376,7 +389,6 @@ void JoSimFile::printPTLstats(){
   unsigned int lenCnt = 0;       // Number of PTLs
   unsigned long lenSum = 0;        // The sum of the PTL length
   // float stdVar = 0;              // Standards variance
-  const double speedConstant = 1 / pow(10, 3) / vg;
 
   cout << "Calculating stats on the transmission lines." << endl;
   lenCnt = this->PTLs.size();
@@ -402,10 +414,10 @@ void JoSimFile::printPTLstats(){
 
   cout << "PTL Delay Statistics:" << endl;
   cout << "\tCnt: "  << lenCnt << endl;
-  cout << "\tMin: "  << lenMin * speedConstant << "ps" << endl;
-  cout << "\tMean: "  << lenMean * speedConstant << "ps" << endl;
-  cout << "\tMax: "  << lenMax * speedConstant << "ps" << endl;
-  cout << "\tTotal: "  << lenSum /1000 << "nm" << endl;
+  cout << "\tMin: "  << lenMin / 1000.0 / this->speedConstant << "ps" << endl;
+  cout << "\tMean: "  << lenMean / 1000.0 / this->speedConstant << "ps" << endl;
+  cout << "\tMax: "  << lenMax / 1000.0 / this->speedConstant << "ps" << endl;
+  cout << "\tTotal: "  << lenSum / 1000 << "nm" << endl;
   // cout << "\tstdVar: "  << stdVar << endl;
 
 }
@@ -422,10 +434,10 @@ void JoSimFile::exportTDelay(const string &fileName){
   
   for(auto itPTL = this->PTLs.begin(); itPTL != this->PTLs.end(); itPTL++){
     if(itPTL != this->PTLs.end()-1){
-      outfile << (*itPTL).getTDelay() << ",";
+      outfile << (*itPTL).getTDdelay() << ",";
     }
     else{
-      outfile << (*itPTL).getTDelay();
+      outfile << (*itPTL).getTDdelay();
     }
   }
 
@@ -479,10 +491,11 @@ string CompClass::to_cir(){
  * @return           [0 - Good; 1 - Error]
  */
 
-int PTLclass::create(const string &PTLname, const string &NetName, int PTLlength){
+int PTLclass::create(const string &PTLname, const string &NetName, int PTLlength, double speedConstant){
   this->name = PTLname;
   this->nameNet = NetName;
   this->length = PTLlength;
+  this->speedConstant = speedConstant;
 
   return 0;
 }
@@ -502,7 +515,7 @@ string PTLclass::to_cir(){
   ss << setw(10) << " " + nameNet + "B";
   ss << setw(4)  << " 0";
 
-  double foo = this->length * speedConstant;
+  double foo = this->getTDdelay();
 
   if(foo < 1.0){
     ss << setprecision(1);
@@ -614,7 +627,7 @@ string makeFileHeader(string someText){
 
 
   foo =  "* JoSIM file generated with Die2Sim, " + (string)asctime(timeinfo);
-  foo += "\n* Jude de Villiers, Stellenbosch University\n\n";
+  foo += "\n* Jude de Villiers, Edrich Verburg, Stellenbosch University\n\n";
 
   return foo;
 }
